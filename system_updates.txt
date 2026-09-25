@@ -1,3 +1,11 @@
 Meeting updates: 
 
 09/25
+Progress:
+- Created a calibration print on Ultimaker S3
+- found printer API and how to call it: http://172.27.135.1/docs/api/#/Printer
+  - polling rate limit potentially 1 every 10s
+
+Problems:
+
+Looking forward:
