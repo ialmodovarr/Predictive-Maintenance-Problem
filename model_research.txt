@@ -1,0 +1,83 @@
+Research 
+
+Random Forest:
+Why?
+  - Good baseline because it works well with small-to-medium tabular datasets, handles nonlinear relationships, does not require feature scaling, is relatively robust to overfitting, and is easy to interpret using feature importance
+Data need: Low-medium
+  - ~3000-8000 rows needed (ideally 5k+)
+    - 10 second windows = 13.9 hours
+  - XGBoost should use same data
+Prediction target:
+  - Nozzle Health State (Healthy / Degrading / Failing)
+  - Belt Health State
+  - Motor Health State
+  - Overall System Health State (derived from worst component state)
+  - TTF for all 3 components (Random ForestRegressor or basic math?)
+    - May be a stretch goal
+      - Need multiple examples of components progressing naturally or controllably from degradation all the way to failure
+    - Could have Urgency (Low / Medium / Critical) instead
+      - Or Failure-risk Horizon (likely failure condition within next X minutes)
+Input Structure:
+  - Features: Engineered summary features
+    - Accelerometer: RMS, mean, standard deviation, peak, peak-to-peak, dominant frequency, maybe kurtosis
+    - Temperature: mean, standard deviation, min, max, range, slope
+    - Filament: average movement rate, movement-rate standard deviation, total movement, filament error, stall fraction
+  - Sampling / Hz:
+    - Accelerometer: 400 Hz
+      - Sensor supports this
+    - Filament Sensor: 10-20 Hz
+      - Pulse/event based, not measurement
+      - Every 0.05-0.1 seconds
+    - Thermocouple: 3 Hz
+      - Temperature changes much more slowly than vibration
+  - Windowing: 10 seconds → compromise between having enough samples to compute stable features and reacting quickly enough to detect a developing fault
+Labels:
+  - Nozzle_state, belt_state, motor_state
+Training/validation/test split:
+  - Cross-validation by run
+  - 70% train / 10% validation / 20% test
+Evaluation metrics:
+  - accuracy, F1-score, and confusion matrices, with particular attention to correctly identifying the degrading state before complete failure
+  - Per-class recall - Of all the times something truly was in a class, how many did the model correctly catch?
+
+XGBoost:
+Why?
+  - Strong choice for the same tabular data because it builds trees sequentially to correct previous errors, which can capture more subtle patterns and often gives strong performance on structured datasets. It is more tunable than Random Forest and may improve prediction accuracy, especially when interactions between vibration, temperature, and filament features are complex
+Data need: Low-medium, similar to RF; same ~3,000–8,000 rows target is reasonable
+Prediction targets: same as RF
+Input structure: same engineered feature rows
+Features: same as RF
+Sampling / Hz: same
+Windowing: same 10-second windows
+Labels: same nozzle_state, belt_state, motor_state
+Train/validation/test: same grouped-by-run strategy
+Evaluation metrics: same
+
+1D-CNN:
+Why?
+  - Good for raw sequential sensor data because it can learn temporal patterns directly from time-series signals instead of relying only on engineered summary features.
+  - Well suited for detecting localized changes or sharp anomalies in vibration, temperature, and filament behavior.
+  - Especially useful for accelerometer data, where fault signatures may exist in the shape/pattern of the signal and could be lost when reduced to RMS, peak, etc.
+Data need: Medium-high
+  - One sample is a 10-second raw sensor window
+  - Target: 5000+ windows → 13.9 hours
+    - More important than total windows is having enough independent healthy, nozzle, belt, and motor runs
+Prediction target:
+  - Same as RF and XGBoost
+Input Structure:
+  - Each 10-second window stays as a sequence over time and each window is assigned a nozzle_state, belt_state, and motor_state
+  - Suggested by ChatGPT
+    - Use accelerometer as the raw CNN signal, then fuse temperature/filament features later
+    - CNN learns from raw accelerometer patterns + engineered temperature/filament information is added afterward.
+    - 1D-CNN processes X/Y/Z acceleration at 400 Hz
+    - Temperature and filament are summarized separately
+    - Their features get concatenated with the CNN output before final classification
+Labels:
+  - Same as RF/XGBoost
+Training/Validation/Test Split:
+  - Keep all windows from the same run_id together.
+  - Hold out ~20% of complete runs as the final test set.
+  - Use grouped 3–5 fold cross-validation on the remaining runs for training/validation.
+  - Never split adjacent windows from the same run across the train and test.
+Evaluation metrics:
+  - Same as RF and XGBoost
