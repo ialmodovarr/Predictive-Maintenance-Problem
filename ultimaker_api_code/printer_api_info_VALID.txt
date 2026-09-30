@@ -1,0 +1,17 @@
+ curl.exe -i -X POST "http://172.27.135.1/api/v1/auth/request" -d "application=Capstone&user=Sofia"
+HTTP/1.1 200 OK
+Server: nginx/1.14.2
+Date: Wed, 30 Sep 2026 16:47:10 GMT
+Content-Type: application/json
+Content-Length: 117
+Connection: keep-alive
+Cache-Control: no-cache, no-store, must-revalidate
+Pragma: no-cache
+Expires: 0
+X-Frame-Options: DENY
+Content-Security-Policy: default-src 'self'; script-src 'self' 'sha256-iTDn4J4v93Ec1Hvi8dzZkFNEBPPRbDXCr7Y8OFbzVfI=' 'sha256-fuSw//yF6Oeh2KUzGZWFCF4Xe12hqdJsT2tbnMzMgEw=' 'sha256-rEJk7A1y6Y0XEa3yyh1EuV9m89/SthJFlelS1eQ4X68=' 'sha256-0SmD7bLn+O8cCEQ1S9kc23l/S0bFH+oTenAdpszFyZI=' 'sha256-ctFSP6dWdcK4JO6KK/hTty7kq+o0Wwfy3W8YqAnfGQM=' 'sha256-eE/bX69k9zFvePUy27m21zIt1yCbGhEDL97ZKO58E9g='; style-src 'self' 'unsafe-inline'; img-src 'self' data: http://172.27.135.1:8080; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'
+X-Content-Type-Options: nosniff
+Referrer-Policy: no-referrer
+Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()
+
+{"id": "6bf926c99944ad9e15da49c2ed1bffb5", "key": "716b548893f2fe16f0d1929b94857484d291b8af67e61685ba9c1ad24f682e30"}
