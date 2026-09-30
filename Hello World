@@ -1,0 +1,17 @@
+/* USER CODE BEGIN 2 */
+
+char message[] = "Hello World!\r\n";
+
+/* USER CODE END 2 */
+
+/* Infinite loop */
+/* USER CODE BEGIN WHILE */
+while (1)
+{
+    HAL_UART_Transmit(&huart2, (uint8_t*)message, sizeof(message) - 1, HAL_MAX_DELAY);
+    HAL_Delay(1000);
+    /* USER CODE END WHILE */
+
+    /* USER CODE BEGIN 3 */
+}
+/* USER CODE END 3 */
