@@ -1,0 +1,144 @@
+# Ultimaker S3 API Data Collection Notes
+
+## 1. Python Scripts
+
+**get_print_data.json_py**
+- Pulls data from the Ultimaker S3 API.
+- Saves the original JSON data to `printer_data.txt`.
+- Keeps the JSON structure for reference.
+
+**get_print_data.csv.py**
+- Pulls the same API data.
+- Converts all JSON fields into CSV columns.
+- Saves the results to `printer_data_all.csv`.
+- Each row represents one polling cycle.
+- Automatically adds columns if new API fields appear.
+
+Both scripts collect data from:
+- `/api/v1/print_job` — Print job information.
+- `/api/v1/printer` — Printer measurements and settings.
+
+## 2. Important Things to Know
+
+**Polling frequency**
+- With `time.sleep(1)`, data is collected approximately every 1.6 seconds.
+- The extra 0.6 seconds comes from making the API requests and processing the responses.
+- This does not mean the printer's internal sensors sample every 1.6 seconds.
+
+**Time elapsed**
+- `time_elapsed` updates inconsistently. It sometimes stays the same for multiple requests before jumping forward.
+- Other measurements, such as temperature and head position, can change even when `time_elapsed` doesn't.
+- `time_elapsed` stays at 0 during `pre_print` and starts increasing when the printer begins printing.
+- We should **not use `time_elapsed` as a direct ML input feature** because it represents printing duration rather than component health.
+- `job.state` already identifies the printer's stage (`pre_print`, `printing`, etc.).
+- Use the laptop timestamps to track when data was actually collected.
+
+**Print health**
+- The printer can report `printing` even when a print is failing.
+- In our test, increasing extrusion speed caused a failing print, but the API continued showing normal-looking temperatures and progress.
+- The API doesn't directly provide actual filament movement speed.
+- Our external sensors will help identify faults that the API alone cannot detect.
+
+## 3. Data We Collect
+
+All available fields from the two API endpoints are saved to CSV.
+
+### A. Timestamps
+- `job_timestamp` — Time the print job response was received.
+- `printer_timestamp` — Time the printer response was received.
+
+### B. Print Job Data (`job.*`)
+- **State:** Current print stage.
+- **Progress:** Percentage completed.
+- **Time elapsed:** Reported printing duration.
+- **Time estimated / total:** Estimated and reported total print duration.
+- **Start / finish / cleaned timestamps:** Job timing information.
+- **Material usage:** Reported material usage for each extruder.
+- **Job name and UUID:** Print file and unique job identifier.
+- **Print cores and materials:** Types, serial numbers, material identifiers, and names.
+- **Other metadata:** Job source, application, user, pause source, result, and reprint information.
+
+### C. Printer Data (`printer.*`)
+
+**Temperatures**
+- `printer.heads.0.extruders.0.hotend.temperature.current` — Current nozzle 1 temperature.
+- `printer.heads.0.extruders.0.hotend.temperature.target` — Target nozzle 1 temperature.
+- `printer.heads.0.extruders.1.hotend.temperature.current` — Current nozzle 2 temperature.
+- `printer.heads.0.extruders.1.hotend.temperature.target` — Target nozzle 2 temperature.
+- `printer.bed.temperature.current` — Current bed temperature.
+- `printer.bed.temperature.target` — Target bed temperature.
+- `printer.bed.type` — Build plate type.
+- `printer.bed.pre_heat.active` — Whether bed preheating is active.
+
+**Movement**
+- `printer.heads.0.position.x/y/z` — Print head position on each axis (three separate CSV columns).
+- `printer.heads.0.acceleration` — Print head acceleration setting.
+- `printer.heads.0.jerk.x/y/z` — Jerk settings for each axis.
+- `printer.heads.0.max_speed.x/y/z` — Maximum speed settings for each axis.
+- `printer.heads.0.fan` — Cooling fan setting.
+
+**Extruders (both 1 and 2)**
+
+The following fields exist for both extruders. Replace `N` with `0` (extruder 1) or `1` (extruder 2).
+
+Prefix: `printer.heads.0.extruders.N.`
+
+- `feeder.acceleration` — Feeder acceleration setting.
+- `feeder.jerk` — Feeder jerk setting.
+- `feeder.max_speed` — Maximum feeder speed setting.
+- `active_material.GUID` / `active_material.guid` — Material identifiers.
+- `active_material.length_remaining` — Reported remaining filament length.
+- `hotend.id` — Hotend type.
+- `hotend.serial` — Hotend serial number.
+- `hotend.revision` — Hotend hardware revision.
+- `hotend.offset.state` — Offset calibration status.
+- `hotend.offset.x/y/z` — Hotend offsets for each axis.
+- `hotend.statistics.material_extruded` — Historical total material extruded.
+- `hotend.statistics.max_temperature_exposed` — Maximum recorded hotend temperature.
+- `hotend.statistics.prints_since_cleaned` — Number of prints since cleaning.
+- `hotend.statistics.time_spent_hot` — Accumulated time the hotend has been hot.
+- `hotend.statistics.last_material_guid` — Identifier of the last material used.
+
+**Other Printer Information**
+- `printer.status` — Overall printer operating status.
+- `printer.diagnostics` — Diagnostic information.
+- `printer.validate_header` — API validation information.
+- `printer.led.blink` — LED blinking setting.
+- `printer.led.brightness` — LED brightness.
+- `printer.led.hue` — LED color hue.
+- `printer.led.saturation` — LED color saturation.
+- `printer.network.ethernet.connected/enabled` — Ethernet connection and enabled status (separate columns).
+- `printer.network.wifi.connected/enabled` — Wi-Fi connection and enabled status (separate columns).
+- `printer.network.wifi.mode` — Wi-Fi operating mode.
+- `printer.network.wifi.ssid` — Wi-Fi network name.
+- `printer.network.wifi_networks.N.SSID` — Detected Wi-Fi network name.
+- `printer.network.wifi_networks.N.connected` — Whether the detected network is connected.
+- `printer.network.wifi_networks.N.security_required` — Whether the network requires authentication.
+- `printer.network.wifi_networks.N.strength` — Wi-Fi signal strength.
+
+For detected Wi-Fi networks, `N` is the network's position in the returned list (0, 1, 2, etc.).
+
+## 4. Notes for Our ML Model
+
+**Potentially useful inputs:**
+- Nozzle and bed temperatures.
+- Print head position and motion settings.
+- Fan setting.
+- Printer state/stage.
+
+**Useful for tracking experiments but generally not direct ML inputs:**
+- Laptop timestamps.
+- Print job UUID and filename (we do not currently have print job ID)
+- Print progress and `time_elapsed`.
+- Print core and material information.
+
+**Probably unnecessary for ML:**
+- Wi-Fi/network information.
+- LED settings.
+- Serial numbers and other identifiers.
+
+We are collecting all API fields for now and will decide which are useful when building the models.
+
+The API data will supplement our external accelerometer, filament motion sensor, and thermocouple measurements. We will use timestamps to synchronize the different data sources.
+
+**Important:** The API cannot directly determine whether a print is healthy or failing. Our fault labels will come from the controlled experiments, not the printer's `state` field.

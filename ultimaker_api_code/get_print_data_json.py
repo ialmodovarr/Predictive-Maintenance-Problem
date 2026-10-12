@@ -3,6 +3,9 @@ import re
 import secrets
 import requests
 import json
+import time
+from datetime import datetime
+from pathlib import Path
 
 PRINTER = "http://172.27.135.1"
 
@@ -17,7 +20,7 @@ def digest_get(uri):
 
     # If it works, return the data
     if response.ok:
-        return response.json()
+        return response.json() # returns json data into python dictionary
 
     # 2. If authentication is required, get the Digest challenge
     if response.status_code != 401:
@@ -69,24 +72,41 @@ def digest_get(uri):
 # --------------------------------------------------
 # GET PRINTER DATA
 # --------------------------------------------------
+def main():
+    endpoints = [
+        "/api/v1/print_job",
+        "/api/v1/printer",
+    ]
 
-endpoints = [
-    "/api/v1/print_job",
-    "/api/v1/printer",
-]
+    output_file = Path(__file__).with_name("printer_data.txt")
 
-for endpoint in endpoints:
-    print("\n" + "=" * 60)
-    print(endpoint)
-    print("=" * 60)
+    with open(output_file, "a", encoding="utf-8") as file:
 
-    try:
-        data = digest_get(endpoint)
-        print(json.dumps(data, indent=2))
+        while True:
+            for endpoint in endpoints:
+                header = "\n" + "=" * 60 + "\n" + endpoint + "\n" + "=" * 60
 
-    except requests.HTTPError as e:
-        print("HTTP error:", e)
-        print("Response:", e.response.text)
+                print(header, file=file)
 
-    except Exception as e:
-        print("Error:", e)
+                try:
+                    data = digest_get(endpoint)
+
+                    timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+                
+                    output = (
+                        f"Laptop timestamp: {timestamp}\n"
+                        + json.dumps(data, indent=2)
+                    )
+
+                except requests.HTTPError as e:
+                    output = f"HTTP error: {e}\nResponse: {e.response.text}"
+
+                except Exception as e:
+                    output = f"Error: {e}"
+
+                print(output, file=file, flush=True)
+
+            time.sleep(1)
+
+if __name__ == "__main__":
+    main()
