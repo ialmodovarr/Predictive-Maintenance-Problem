@@ -6,8 +6,19 @@ Progress:
 - found printer API and how to call it: http://172.27.135.1/docs/api/#/Printer
   - polling rate limit potentially 1 every 10s
 
-- Problems:
+- Roadblocks/Issues:
   * Our SFS won't work with the Ultimaker S3, we're brainstomring alternative ways to measure the rate that the filament comes out at
 
 
 Looking forward:
+
+
+10/12
+Progress:
+  - Established repeatable falure
+    - metric: **SOFIA**
+  - Extracted API data and saved it to CSV/JSON file
+  - Established/organized file structure of all machine learning models and data preprocessing pipeline
+
+- Roadblocks/Issues:
+   * Wire lengths for sensors need to be longer, may need to order new ones
