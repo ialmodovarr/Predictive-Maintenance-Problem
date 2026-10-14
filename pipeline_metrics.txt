@@ -1,19 +1,19 @@
 EXTRUDER 1 
 - jerk
+- acceleration
 - max speed
-- current temperature
-- target temperature
+- current/target temperature --> temperature error (current - target), rolling standard deviation
 
 
 PRINT HEAD
-- x, y and z position
-- x, y, and z jerk
+- x, y and z position --> Rolling velocity standard deviation
+- x, y, and z jerk --> Rolling standard deviation of the settings
 - x, y and z max speed 
+- acceleration
 
 
 PRINT BED
-- current temperature
-- target temperature
+- current/target temperature --> Bed temperature error and rolling standard deviation
 
 
 EXTRUDER 2
