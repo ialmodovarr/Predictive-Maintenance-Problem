@@ -6,8 +6,8 @@ EXTRUDER 1
 
 
 PRINT HEAD
-- x, y and z position --> Rolling velocity standard deviation
-- x, y, and z jerk --> Rolling standard deviation of the settings
+- x, y and z position --> Rolling velocity and standard deviation
+- x, y, and z jerk --> Rolling standard deviation
 - x, y and z max speed 
 - acceleration
 
