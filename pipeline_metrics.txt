@@ -3,6 +3,10 @@ EXTRUDER 1
 - acceleration
 - max speed
 - current/target temperature --> temperature error (current - target), rolling standard deviation
+- material extruded
+- max temperature exposed
+- prints since cleaned
+- time spent hot
 
 
 PRINT HEAD
