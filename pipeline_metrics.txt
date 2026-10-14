@@ -1,13 +1,8 @@
 EXTRUDER 1 
-- acceleration
 - jerk
 - max speed
 - current temperature
 - target temperature
-
-
-EXTRUDER 2
-N/A
 
 
 PRINT HEAD
@@ -19,3 +14,7 @@ PRINT HEAD
 PRINT BED
 - current temperature
 - target temperature
+
+
+EXTRUDER 2
+N/A
