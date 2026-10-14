@@ -1,0 +1,12 @@
+EXTRUDER 1 
+- acceleration
+- jerk
+- max speed
+- 
+
+
+EXTRUDER 2
+
+PRINT HEAD
+
+PRINT BED
