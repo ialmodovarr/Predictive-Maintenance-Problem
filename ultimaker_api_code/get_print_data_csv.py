@@ -149,6 +149,9 @@ def main():
 
     while True:
         try:
+
+            start_time = time.perf_counter()
+
             # Request print job data
             job = digest_get("/api/v1/print_job")
             job_timestamp = datetime.now().isoformat(
@@ -177,7 +180,11 @@ def main():
         except Exception as e:
             print("Error collecting data:", e)
 
-        time.sleep(1)
+        end_time = time.perf_counter()
+        elapsed_time = end_time - start_time
+
+        sleep_time = max(0, 1 - elapsed_time)
+        time.sleep(sleep_time)
 
 if __name__ == "__main__":
     main()
