@@ -11,7 +11,7 @@ ML_MODELS/
 ├── src/                  # Core Python code
 │   ├── data/             # Data loading, preprocessing
 │   ├── features/         # Feature engineering
-│   ├── models/           # Model definitions, training loops
+│   ├── models/           # Model definitions for feature engineering
 │   ├── utils/            # Helper functions, utilities
 │   └── __init__.py
 │
