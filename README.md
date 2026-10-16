@@ -14,17 +14,21 @@ ADXL345 on print head --(4-wire cable, I2C)--> Nucleo STM32 --(USB)--> laptop: l
 
 **Most of you only need Part 1** (record data). The board is already programmed, and it keeps its program when unplugged. Part 3 is only for reprogramming the board or setting up a new one.
 
-### What's in this folder
+### Getting the files
+
+On this repo's GitHub page, click the green **Code** button > **Download ZIP**, then unzip it (double-click on Mac; right-click > **Extract All** on Windows). You get a folder named after the repo, ending in `-main`. Every command below runs from inside that folder. Replace `REPO-FOLDER` in the commands with its real name.
+
+## What's in this repo
 
 | File | What it is |
 |---|---|
 | `README.md` / `ADXL345_Team_Guide.docx` | This guide (same content, two formats) |
-| `code/live_accel.py` | Live viewer + recorder. Runs on your laptop (Mac or Windows) |
-| `code/requirements.txt` | Python packages the viewer needs |
-| `code/firmware/adxl345.h`, `adxl345.c` | Accelerometer driver for the STM32 |
-| `code/firmware/main_usercode_blocks.c` | The 4 code blocks to paste into a new CubeMX project's `main.c` |
-| `code/firmware/main_team_project.c` | The full `main.c` currently on the board (includes a teammate's thermocouple code too) |
-| `images/` | Pictures used in this guide |
+| `live_accel.py` | Live viewer + recorder. Runs on your laptop (Mac or Windows) |
+| `requirements.txt` | Python packages the viewer needs |
+| `adxl345.h`, `adxl345.c` | Accelerometer driver for the STM32 |
+| `main_usercode_blocks.c` | The 4 code blocks to paste into a new CubeMX project's `main.c` |
+| `main_team_project.c` | The full `main.c` currently on the board (includes a teammate's thermocouple code too) |
+| `*.png`, `*.jpg` | Pictures used in this guide |
 
 ## Part 1: Record data (board already programmed)
 
@@ -32,9 +36,9 @@ ADXL345 on print head --(4-wire cable, I2C)--> Nucleo STM32 --(USB)--> laptop: l
 
 The sensor is on the **top block of the print head** (the block the two clear filament tubes come out of), standing vertically with its connector pointing up. Its cable runs up along one of the clear tubes to the back of the printer.
 
-![The ADXL345 on the print head (temporary electrical tape mount).](images/mount_closeup.jpg)
+![The ADXL345 on the print head (temporary electrical tape mount).](mount_closeup.jpg)
 
-![Cable route: up along the clear filament tube to the back of the printer.](images/mount_cable_route.jpg)
+![Cable route: up along the clear filament tube to the back of the printer.](mount_cable_route.jpg)
 
 Before every session:
 
@@ -49,7 +53,7 @@ Before every session:
 | Yellow | **SCL / D15** | Right inner header, top hole |
 | Blue | **SDA / D14** | Right inner header, 2nd hole |
 
-![Where the 4 wires go on the Nucleo.](images/01_nucleo_wiring.jpg)
+![Where the 4 wires go on the Nucleo.](01_nucleo_wiring.jpg)
 
 Never use the 5V or VIN holes for the sensor.
 
@@ -65,10 +69,10 @@ You need Python 3.9 or newer and three packages.
 
 1. Open **Terminal** (Cmd + Space, type `Terminal`, Enter).
 2. Check Python: `python3 --version`. If you get "command not found", install Python from python.org (macOS installer).
-3. Go to the `code` folder of this guide and install the packages (change the path if you saved the folder somewhere else):
+3. Go to the downloaded repo folder and install the packages (change the path if you saved it somewhere else):
 
 ```bash
-cd ~/Downloads/accelerometer-guide/code
+cd ~/Downloads/REPO-FOLDER
 python3 -m pip install -r requirements.txt
 ```
 
@@ -78,7 +82,7 @@ python3 -m pip install -r requirements.txt
 ls /dev/tty.usbmodem*
 ```
 
-![Mac example: install, then confirm the board shows up as /dev/tty.usbmodem....](images/mac_setup.png)
+![Mac example: install, then confirm the board shows up as /dev/tty.usbmodem....](mac_setup.png)
 
 No ST-LINK driver is needed on a Mac.
 
@@ -86,10 +90,10 @@ No ST-LINK driver is needed on a Mac.
 
 1. **Install Python** from python.org (Windows installer). On the first installer screen, **tick "Add python.exe to PATH"**, then click Install Now.
 2. Open **PowerShell** (Start menu, type `PowerShell`, Enter).
-3. Go to the `code` folder and install the packages:
+3. Go to the downloaded repo folder and install the packages:
 
 ```powershell
-cd $HOME\Downloads\accelerometer-guide\code
+cd $HOME\Downloads\REPO-FOLDER
 py -m pip install -r requirements.txt
 ```
 
@@ -101,19 +105,19 @@ py -m serial.tools.list_ports -v
 
 You should see a port described as **STMicroelectronics STLink Virtual COM Port**. Note its COM number. You can also find it in **Device Manager > Ports (COM & LPT)**.
 
-![Windows example: install, then list ports. The Nucleo is COM5 here; yours may differ.](images/win_setup.png)
+![Windows example: install, then list ports. The Nucleo is COM5 here; yours may differ.](win_setup.png)
 
-![The same board in Device Manager.](images/win_devmgr.png)
+![The same board in Device Manager.](win_devmgr.png)
 
 If there is **no STLink port** in Device Manager but the board's LEDs are on, the ST-LINK driver is missing. Installing STM32CubeIDE installs it. Without CubeIDE, install ST's driver package **STSW-LINK009** from st.com and replug the board.
 
 ### Step 3. Record a run
 
-Run the recorder from the `code` folder. Always give a `--label` that says what the run is (see the label rules in Part 2).
+Run the recorder from the repo folder. Always give a `--label` that says what the run is (see the label rules in Part 2).
 
 | | Mac (Terminal) | Windows (PowerShell) |
 |---|---|---|
-| Go to the folder | `cd ~/Downloads/accelerometer-guide/code` | `cd $HOME\Downloads\accelerometer-guide\code` |
+| Go to the folder | `cd ~/Downloads/REPO-FOLDER` | `cd $HOME\Downloads\REPO-FOLDER` |
 | Start recording | `python3 live_accel.py --label "..."` | `py live_accel.py --label "..."` |
 | Pick the port yourself (only if needed) | `... --port /dev/tty.usbmodem1103` | `... --port COM5` |
 
@@ -125,9 +129,9 @@ The script finds the board by itself. Then:
 4. Start the print on the S3, and **write down the clock time** you pressed start (and when it finished).
 5. When the print is done and the head is still again, **close the plot window**. That stops the recording and saves the file.
 
-![Mac example of a full run.](images/mac_run.png)
+![Mac example of a full run.](mac_run.png)
 
-![Windows example of a full run.](images/win_run.png)
+![Windows example of a full run.](win_run.png)
 
 The CSV is saved in the folder you ran the command from, named `accel_<date>_<time>.csv`.
 
@@ -137,15 +141,15 @@ Keep the laptop **plugged in, lid open and awake** the whole time. If it sleeps,
 
 **Idle (printer still):** flat lines. With the board mounted vertically, **X sits near +1.0 g** (that's gravity), Y and Z near 0. The black vibration line stays around **0.01 g**.
 
-![Idle, from our Oct 14 recording.](images/live_plot_idle.png)
+![Idle, from our Oct 14 recording.](live_plot_idle.png)
 
 **Printing:** all three lines shake and the vibration line jumps to about **0.1 to 0.5 g**, higher on fast moves and corners. The title should keep saying **200 samples/s**.
 
-![Printing, same recording.](images/live_plot_printing.png)
+![Printing, same recording.](live_plot_printing.png)
 
 A whole print looks like this when you plot the saved file afterwards. Idle, short bursts while the printer heats and levels the bed, a long printing section, then idle again:
 
-![The full Oct 14 test print (33 min). Printing is about 30x the idle noise.](images/run_summary.png)
+![The full Oct 14 test print (33 min). Printing is about 30x the idle noise.](run_summary.png)
 
 ### Step 5. Save and share
 
@@ -220,7 +224,7 @@ Only needed for a new Nucleo, or if the firmware changes. Same steps on Mac and 
 ### 4.3 Add the code
 
 1. In CubeIDE's **Project Explorer**, expand `sensors > Core`. From your file manager, drag `adxl345.h` onto **Inc** and `adxl345.c` onto **Src**. Choose **Copy files**.
-2. Open `Core/Src/main.c`. Open `code/firmware/main_usercode_blocks.c` next to it. Paste each of the 4 blocks **between** the matching CubeMX comments:
+2. Open `Core/Src/main.c`. Open `main_usercode_blocks.c` next to it. Paste each of the 4 blocks **between** the matching CubeMX comments:
 
 | Block | Goes between |
 |---|---|
@@ -237,7 +241,7 @@ Keep those comment lines exactly as CubeMX wrote them. Code outside them, or bet
 2. **Click the project name** `sensors` in Project Explorer, then **Run > Run As > STM32 C/C++ Application**, click **OK** on the configuration window. If it offers an ST-LINK firmware update, accept, then Run again. After the first time, the green Run button is enough.
 3. Wait for **Download verified successfully**. The board now runs the program, and keeps it after unplugging.
 
-![What a good build and flash look like in the CubeIDE Console (example).](images/cubeide_console.png)
+![What a good build and flash look like in the CubeIDE Console (example).](cubeide_console.png)
 
 Then go to Part 1, Step 3.
 
@@ -254,7 +258,7 @@ Then go to Part 1, Step 3.
 | Sample rate in the title well below 200 | Laptop busy, or old firmware (10/s) | Close heavy apps. Reflash with the current firmware |
 | Mac: `pip3 install` worked but `import serial` fails | Packages went to a different Python | Always use `python3 -m pip install ...` |
 | Windows: `py` is not recognized | Python not on PATH | Reinstall Python with "Add python.exe to PATH", or use `python` instead of `py` |
-| Mac: `can't open file ... live_accel.py` | Not in the right folder, or browser renamed it `live_accel (1).py` | `cd` into the `code` folder; check with `ls` (Mac) / `dir` (Windows) |
+| Mac: `can't open file ... live_accel.py` | Not in the right folder, or browser renamed it `live_accel (1).py` | `cd` into the repo folder; check with `ls` (Mac) / `dir` (Windows) |
 | CubeIDE: "selection cannot be launched" | Console was selected, not the project | Click `sensors` in Project Explorer, then Run As > STM32 C/C++ Application |
 | CubeIDE: "No ST-LINK detected" | Same as the charge-only cable problem | Data cable, direct port |
 | Build: `huart2 undeclared` / `implicit declaration of HAL_UART_Transmit` | USART2 not enabled in CubeMX | Part 4.2 step 5, regenerate |
@@ -269,9 +273,9 @@ Then go to Part 1, Step 3.
 
 ## Appendix: full code
 
-Everything below is also in the `code/` folder as files. Copy from the files, not from this document (word processors can change quotes and spacing).
+Everything below is also in this repo as separate files. Copy from the files, not from this document (word processors can change quotes and spacing).
 
-### A. code/live_accel.py
+### A. live_accel.py
 
 ```python
 #!/usr/bin/env python3
@@ -430,7 +434,7 @@ if __name__ == "__main__":
     main()
 ```
 
-### B. code/firmware/adxl345.h
+### B. adxl345.h
 
 ```c
 #ifndef ADXL345_H
@@ -454,7 +458,7 @@ HAL_StatusTypeDef adxl345_read_xyz(I2C_HandleTypeDef *hi2c, int16_t *x, int16_t 
 #endif
 ```
 
-### C. code/firmware/adxl345.c
+### C. adxl345.c
 
 ```c
 #include "adxl345.h"
@@ -500,7 +504,7 @@ HAL_StatusTypeDef adxl345_read_xyz(I2C_HandleTypeDef *hi2c, int16_t *x, int16_t 
 }
 ```
 
-### D. code/firmware/main_usercode_blocks.c
+### D. main_usercode_blocks.c
 
 ```c
 /* =====================================================================
