@@ -1,0 +1,19 @@
+#ifndef ADXL345_H
+#define ADXL345_H
+
+#include "stm32f4xx_hal.h"   /* Nucleo-F446RE. Change if you use a different STM32 family. */
+
+/* SDO/ALT pin low or unconnected -> 0x53. If the I2C scan shows 0x1D, use (0x1D << 1). */
+#define ADXL345_ADDR            (0x53 << 1)
+
+#define ADXL345_REG_DEVID       0x00
+#define ADXL345_REG_BW_RATE     0x2C
+#define ADXL345_REG_POWER_CTL   0x2D
+#define ADXL345_REG_DATA_FORMAT 0x31
+#define ADXL345_REG_DATAX0      0x32
+
+HAL_StatusTypeDef adxl345_read_devid(I2C_HandleTypeDef *hi2c, uint8_t *id);
+HAL_StatusTypeDef adxl345_init(I2C_HandleTypeDef *hi2c);
+HAL_StatusTypeDef adxl345_read_xyz(I2C_HandleTypeDef *hi2c, int16_t *x, int16_t *y, int16_t *z);
+
+#endif
