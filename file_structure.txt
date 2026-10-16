@@ -1,14 +1,15 @@
 FILE STRUCTURE:
+#clean up code structure between API and sensor
 
 ML_MODELS/
 │
-├── data/
+├── data-API/
 │   ├── raw/              # Original, unmodified datasets
 │   ├── processed/        # Cleaned, transformed, feature‑engineered data
 │   └── external/         # API data sources
 │
 │
-├── src/                  # Core Python code
+├── data-sensor/                  # Core Python code
 │   ├── data/             # Data loading, preprocessing
 │   ├── features/         # Feature engineering
 │   ├── models/           # Model definitions for feature engineering
