@@ -1,0 +1,100 @@
+Ultimaker S3 API post-processing summary
+Input file: /mnt/c/Users/isabe/OneDrive/4TH YEAR/CAPSTONE/ML MODELS/data/api_data/api_data.txt
+Output features: /mnt/c/Users/isabe/OneDrive/4TH YEAR/CAPSTONE/ML MODELS/data/processed/printer_features.csv
+Random Forest numeric matrix: /mnt/c/Users/isabe/OneDrive/4TH YEAR/CAPSTONE/ML MODELS/data/processed/random_forest_features.csv
+Random Forest row metadata: /mnt/c/Users/isabe/OneDrive/4TH YEAR/CAPSTONE/ML MODELS/data/processed/random_forest_metadata.csv
+Rows parsed (/api/v1/printer): 6
+Metric values masked by thresholds: 0
+Parse warnings: 1
+Rolling window: 5 samples
+
+Parse warnings:
+Printer section 14: missing laptop timestamp
+
+Columns in full output:
+laptop_time
+section
+extruder1_jerk
+extruder1_acceleration
+extruder1_max_speed
+extruder1_temp_current
+extruder1_temp_target
+extruder1_material_extruded
+extruder1_max_temperature_exposed_c
+extruder1_prints_since_cleaned
+extruder1_time_spent_hot_s
+head_x_mm
+head_y_mm
+head_z_mm
+head_x_jerk
+head_y_jerk
+head_z_jerk
+head_x_max_speed
+head_y_max_speed
+head_z_max_speed
+head_acceleration
+bed_temp_current
+bed_temp_target
+elapsed_seconds
+extruder1_temp_error_c
+bed_temp_error_c
+extruder1_temp_error_c_rolling_std
+bed_temp_error_c_rolling_std
+head_x_mm_rolling_std
+head_y_mm_rolling_std
+head_z_mm_rolling_std
+head_x_jerk_rolling_std
+head_y_jerk_rolling_std
+head_z_jerk_rolling_std
+head_x_velocity_mm_s
+head_x_velocity_mm_s_rolling_std
+head_y_velocity_mm_s
+head_y_velocity_mm_s_rolling_std
+head_z_velocity_mm_s
+head_z_velocity_mm_s_rolling_std
+missing_required_metric_count
+
+Numeric Random Forest feature columns:
+extruder1_jerk
+extruder1_acceleration
+extruder1_max_speed
+extruder1_temp_current
+extruder1_temp_target
+extruder1_material_extruded
+extruder1_max_temperature_exposed_c
+extruder1_prints_since_cleaned
+extruder1_time_spent_hot_s
+head_x_mm
+head_y_mm
+head_z_mm
+head_x_jerk
+head_y_jerk
+head_z_jerk
+head_x_max_speed
+head_y_max_speed
+head_z_max_speed
+head_acceleration
+bed_temp_current
+bed_temp_target
+extruder1_temp_error_c
+bed_temp_error_c
+extruder1_temp_error_c_rolling_std
+bed_temp_error_c_rolling_std
+head_x_mm_rolling_std
+head_y_mm_rolling_std
+head_z_mm_rolling_std
+head_x_jerk_rolling_std
+head_y_jerk_rolling_std
+head_z_jerk_rolling_std
+head_x_velocity_mm_s
+head_x_velocity_mm_s_rolling_std
+head_y_velocity_mm_s
+head_y_velocity_mm_s_rolling_std
+head_z_velocity_mm_s
+head_z_velocity_mm_s_rolling_std
+missing_required_metric_count
+
+Metadata columns kept separately:
+laptop_time
+section
+elapsed_seconds

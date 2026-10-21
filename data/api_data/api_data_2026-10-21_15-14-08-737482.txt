@@ -1,0 +1,1437 @@
+Printer data collection started: 2026-10-21 15:14:08.742199
+============================================================
+
+============================================================
+/api/v1/print_job
+============================================================
+Laptop timestamp: 15:14:08.852
+{
+  "datetime_cleaned": "",
+  "datetime_finished": "",
+  "datetime_started": "2026-10-21T19:05:51+00:00",
+  "material_0_usage": 639.0,
+  "material_1_usage": -1.0,
+  "name": "UMS3_AIl_In_One_3D_printer_test_nano_scaled_down_70.ufp",
+  "pause_source": "",
+  "progress": 0.18,
+  "reprint_original_uuid": "",
+  "result": "",
+  "source": "WEB_API",
+  "source_application": "Ultimaker Connect",
+  "source_user": "",
+  "state": "printing",
+  "time_elapsed": 234,
+  "time_estimated": 1308,
+  "time_total": 1304,
+  "used_hotend_types_0": [
+    {
+      "serial": "4535bf390000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_hotend_types_1": [
+    {
+      "serial": "0cbd393a0000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_materials_0_guid": [
+    {
+      "UUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+      "name": "Generic PLA Generic"
+    }
+  ],
+  "used_materials_1_guid": [],
+  "uuid": "7b2e1b11-e623-4aeb-aae1-b02c77a59c55"
+}
+
+============================================================
+/api/v1/printer
+============================================================
+Laptop timestamp: 15:14:09.370
+{
+  "bed": {
+    "pre_heat": {
+      "active": false
+    },
+    "temperature": {
+      "current": 60.0,
+      "target": 60.0
+    },
+    "type": "glass"
+  },
+  "diagnostics": {},
+  "heads": [
+    {
+      "acceleration": 2000.0,
+      "extruders": [
+        {
+          "active_material": {
+            "GUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "4535bf390000",
+            "statistics": {
+              "last_material_guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+              "material_extruded": 850010,
+              "max_temperature_exposed": 253,
+              "prints_since_cleaned": "118",
+              "time_spent_hot": 3985980
+            },
+            "temperature": {
+              "current": 201.8,
+              "target": 201.4
+            }
+          }
+        },
+        {
+          "active_material": {
+            "GUID": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": -0.7317073170731714,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "0cbd393a0000",
+            "statistics": {
+              "last_material_guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+              "material_extruded": 497560,
+              "max_temperature_exposed": 273,
+              "prints_since_cleaned": "61",
+              "time_spent_hot": 3376620
+            },
+            "temperature": {
+              "current": 46.5,
+              "target": 0.0
+            }
+          }
+        }
+      ],
+      "fan": 100.0,
+      "jerk": {
+        "x": 20.0,
+        "y": 20.0,
+        "z": 0.4
+      },
+      "max_speed": {
+        "x": 300.0,
+        "y": 300.0,
+        "z": 40.0
+      },
+      "position": {
+        "x": 118.031,
+        "y": 109.09,
+        "z": 2.0
+      }
+    }
+  ],
+  "led": {
+    "blink": {},
+    "brightness": 100.0,
+    "hue": 0.0,
+    "saturation": 0.0
+  },
+  "network": {
+    "ethernet": {
+      "connected": false,
+      "enabled": false
+    },
+    "wifi": {
+      "connected": true,
+      "enabled": true,
+      "mode": "WIRELESS",
+      "ssid": "UM-NO-HOTSPOT-NAME-SET"
+    },
+    "wifi_networks": [
+      {
+        "SSID": "wahoo",
+        "connected": true,
+        "security_required": false,
+        "strength": 73
+      },
+      {
+        "SSID": "UVA Guest",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "UVA WiFi Setup",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "eduroam",
+        "connected": false,
+        "security_required": true,
+        "strength": 63
+      },
+      {
+        "SSID": "DIRECT-68-HP M277 LaserJet",
+        "connected": false,
+        "security_required": true,
+        "strength": 50
+      }
+    ]
+  },
+  "status": "printing",
+  "validate_header": {}
+}
+
+============================================================
+/api/v1/print_job
+============================================================
+Laptop timestamp: 15:14:10.702
+{
+  "datetime_cleaned": "",
+  "datetime_finished": "",
+  "datetime_started": "2026-10-21T19:05:51+00:00",
+  "material_0_usage": 639.0,
+  "material_1_usage": -1.0,
+  "name": "UMS3_AIl_In_One_3D_printer_test_nano_scaled_down_70.ufp",
+  "pause_source": "",
+  "progress": 0.18,
+  "reprint_original_uuid": "",
+  "result": "",
+  "source": "WEB_API",
+  "source_application": "Ultimaker Connect",
+  "source_user": "",
+  "state": "printing",
+  "time_elapsed": 234,
+  "time_estimated": 1308,
+  "time_total": 1304,
+  "used_hotend_types_0": [
+    {
+      "serial": "4535bf390000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_hotend_types_1": [
+    {
+      "serial": "0cbd393a0000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_materials_0_guid": [
+    {
+      "UUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+      "name": "Generic PLA Generic"
+    }
+  ],
+  "used_materials_1_guid": [],
+  "uuid": "7b2e1b11-e623-4aeb-aae1-b02c77a59c55"
+}
+
+============================================================
+/api/v1/printer
+============================================================
+Laptop timestamp: 15:14:11.418
+{
+  "bed": {
+    "pre_heat": {
+      "active": false
+    },
+    "temperature": {
+      "current": 60.0,
+      "target": 60.0
+    },
+    "type": "glass"
+  },
+  "diagnostics": {},
+  "heads": [
+    {
+      "acceleration": 1000.0,
+      "extruders": [
+        {
+          "active_material": {
+            "GUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "4535bf390000",
+            "statistics": {
+              "last_material_guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+              "material_extruded": 850010,
+              "max_temperature_exposed": 253,
+              "prints_since_cleaned": "118",
+              "time_spent_hot": 3985980
+            },
+            "temperature": {
+              "current": 202.0,
+              "target": 201.4
+            }
+          }
+        },
+        {
+          "active_material": {
+            "GUID": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": -0.7317073170731714,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "0cbd393a0000",
+            "statistics": {
+              "last_material_guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+              "material_extruded": 497560,
+              "max_temperature_exposed": 273,
+              "prints_since_cleaned": "61",
+              "time_spent_hot": 3376620
+            },
+            "temperature": {
+              "current": 46.3,
+              "target": 0.0
+            }
+          }
+        }
+      ],
+      "fan": 100.0,
+      "jerk": {
+        "x": 20.0,
+        "y": 20.0,
+        "z": 0.4
+      },
+      "max_speed": {
+        "x": 300.0,
+        "y": 300.0,
+        "z": 40.0
+      },
+      "position": {
+        "x": 116.985,
+        "y": 110.914,
+        "z": 2.0
+      }
+    }
+  ],
+  "led": {
+    "blink": {},
+    "brightness": 100.0,
+    "hue": 0.0,
+    "saturation": 0.0
+  },
+  "network": {
+    "ethernet": {
+      "connected": false,
+      "enabled": false
+    },
+    "wifi": {
+      "connected": true,
+      "enabled": true,
+      "mode": "WIRELESS",
+      "ssid": "UM-NO-HOTSPOT-NAME-SET"
+    },
+    "wifi_networks": [
+      {
+        "SSID": "wahoo",
+        "connected": true,
+        "security_required": false,
+        "strength": 73
+      },
+      {
+        "SSID": "UVA Guest",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "UVA WiFi Setup",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "eduroam",
+        "connected": false,
+        "security_required": true,
+        "strength": 63
+      },
+      {
+        "SSID": "DIRECT-68-HP M277 LaserJet",
+        "connected": false,
+        "security_required": true,
+        "strength": 50
+      }
+    ]
+  },
+  "status": "printing",
+  "validate_header": {}
+}
+
+============================================================
+/api/v1/print_job
+============================================================
+Laptop timestamp: 15:14:12.508
+{
+  "datetime_cleaned": "",
+  "datetime_finished": "",
+  "datetime_started": "2026-10-21T19:05:51+00:00",
+  "material_0_usage": 639.0,
+  "material_1_usage": -1.0,
+  "name": "UMS3_AIl_In_One_3D_printer_test_nano_scaled_down_70.ufp",
+  "pause_source": "",
+  "progress": 0.18,
+  "reprint_original_uuid": "",
+  "result": "",
+  "source": "WEB_API",
+  "source_application": "Ultimaker Connect",
+  "source_user": "",
+  "state": "printing",
+  "time_elapsed": 239,
+  "time_estimated": 1308,
+  "time_total": 1304,
+  "used_hotend_types_0": [
+    {
+      "serial": "4535bf390000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_hotend_types_1": [
+    {
+      "serial": "0cbd393a0000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_materials_0_guid": [
+    {
+      "UUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+      "name": "Generic PLA Generic"
+    }
+  ],
+  "used_materials_1_guid": [],
+  "uuid": "7b2e1b11-e623-4aeb-aae1-b02c77a59c55"
+}
+
+============================================================
+/api/v1/printer
+============================================================
+Laptop timestamp: 15:14:12.954
+{
+  "bed": {
+    "pre_heat": {
+      "active": false
+    },
+    "temperature": {
+      "current": 60.0,
+      "target": 60.0
+    },
+    "type": "glass"
+  },
+  "diagnostics": {},
+  "heads": [
+    {
+      "acceleration": 2000.0,
+      "extruders": [
+        {
+          "active_material": {
+            "GUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "4535bf390000",
+            "statistics": {
+              "last_material_guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+              "material_extruded": 850010,
+              "max_temperature_exposed": 253,
+              "prints_since_cleaned": "118",
+              "time_spent_hot": 3985980
+            },
+            "temperature": {
+              "current": 202.0,
+              "target": 201.4
+            }
+          }
+        },
+        {
+          "active_material": {
+            "GUID": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": -0.7317073170731714,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "0cbd393a0000",
+            "statistics": {
+              "last_material_guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+              "material_extruded": 497560,
+              "max_temperature_exposed": 273,
+              "prints_since_cleaned": "61",
+              "time_spent_hot": 3376620
+            },
+            "temperature": {
+              "current": 46.1,
+              "target": 0.0
+            }
+          }
+        }
+      ],
+      "fan": 100.0,
+      "jerk": {
+        "x": 20.0,
+        "y": 20.0,
+        "z": 0.4
+      },
+      "max_speed": {
+        "x": 300.0,
+        "y": 300.0,
+        "z": 40.0
+      },
+      "position": {
+        "x": 112.859,
+        "y": 100.667,
+        "z": 2.0
+      }
+    }
+  ],
+  "led": {
+    "blink": {},
+    "brightness": 100.0,
+    "hue": 0.0,
+    "saturation": 0.0
+  },
+  "network": {
+    "ethernet": {
+      "connected": false,
+      "enabled": false
+    },
+    "wifi": {
+      "connected": true,
+      "enabled": true,
+      "mode": "WIRELESS",
+      "ssid": "UM-NO-HOTSPOT-NAME-SET"
+    },
+    "wifi_networks": [
+      {
+        "SSID": "wahoo",
+        "connected": true,
+        "security_required": false,
+        "strength": 73
+      },
+      {
+        "SSID": "UVA Guest",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "UVA WiFi Setup",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "eduroam",
+        "connected": false,
+        "security_required": true,
+        "strength": 63
+      },
+      {
+        "SSID": "DIRECT-68-HP M277 LaserJet",
+        "connected": false,
+        "security_required": true,
+        "strength": 50
+      }
+    ]
+  },
+  "status": "printing",
+  "validate_header": {}
+}
+
+============================================================
+/api/v1/print_job
+============================================================
+Laptop timestamp: 15:14:14.057
+{
+  "datetime_cleaned": "",
+  "datetime_finished": "",
+  "datetime_started": "2026-10-21T19:05:51+00:00",
+  "material_0_usage": 639.0,
+  "material_1_usage": -1.0,
+  "name": "UMS3_AIl_In_One_3D_printer_test_nano_scaled_down_70.ufp",
+  "pause_source": "",
+  "progress": 0.18,
+  "reprint_original_uuid": "",
+  "result": "",
+  "source": "WEB_API",
+  "source_application": "Ultimaker Connect",
+  "source_user": "",
+  "state": "printing",
+  "time_elapsed": 239,
+  "time_estimated": 1308,
+  "time_total": 1304,
+  "used_hotend_types_0": [
+    {
+      "serial": "4535bf390000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_hotend_types_1": [
+    {
+      "serial": "0cbd393a0000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_materials_0_guid": [
+    {
+      "UUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+      "name": "Generic PLA Generic"
+    }
+  ],
+  "used_materials_1_guid": [],
+  "uuid": "7b2e1b11-e623-4aeb-aae1-b02c77a59c55"
+}
+
+============================================================
+/api/v1/printer
+============================================================
+Laptop timestamp: 15:14:14.592
+{
+  "bed": {
+    "pre_heat": {
+      "active": false
+    },
+    "temperature": {
+      "current": 60.0,
+      "target": 60.0
+    },
+    "type": "glass"
+  },
+  "diagnostics": {},
+  "heads": [
+    {
+      "acceleration": 2000.0,
+      "extruders": [
+        {
+          "active_material": {
+            "GUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "4535bf390000",
+            "statistics": {
+              "last_material_guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+              "material_extruded": 850010,
+              "max_temperature_exposed": 253,
+              "prints_since_cleaned": "118",
+              "time_spent_hot": 3985980
+            },
+            "temperature": {
+              "current": 201.8,
+              "target": 201.4
+            }
+          }
+        },
+        {
+          "active_material": {
+            "GUID": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": -0.7317073170731714,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "0cbd393a0000",
+            "statistics": {
+              "last_material_guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+              "material_extruded": 497560,
+              "max_temperature_exposed": 273,
+              "prints_since_cleaned": "61",
+              "time_spent_hot": 3376620
+            },
+            "temperature": {
+              "current": 46.0,
+              "target": 0.0
+            }
+          }
+        }
+      ],
+      "fan": 100.0,
+      "jerk": {
+        "x": 20.0,
+        "y": 20.0,
+        "z": 0.4
+      },
+      "max_speed": {
+        "x": 300.0,
+        "y": 300.0,
+        "z": 40.0
+      },
+      "position": {
+        "x": 114.516,
+        "y": 93.112,
+        "z": 2.0
+      }
+    }
+  ],
+  "led": {
+    "blink": {},
+    "brightness": 100.0,
+    "hue": 0.0,
+    "saturation": 0.0
+  },
+  "network": {
+    "ethernet": {
+      "connected": false,
+      "enabled": false
+    },
+    "wifi": {
+      "connected": true,
+      "enabled": true,
+      "mode": "WIRELESS",
+      "ssid": "UM-NO-HOTSPOT-NAME-SET"
+    },
+    "wifi_networks": [
+      {
+        "SSID": "wahoo",
+        "connected": true,
+        "security_required": false,
+        "strength": 73
+      },
+      {
+        "SSID": "UVA Guest",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "UVA WiFi Setup",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "eduroam",
+        "connected": false,
+        "security_required": true,
+        "strength": 63
+      },
+      {
+        "SSID": "DIRECT-68-HP M277 LaserJet",
+        "connected": false,
+        "security_required": true,
+        "strength": 50
+      }
+    ]
+  },
+  "status": "printing",
+  "validate_header": {}
+}
+
+============================================================
+/api/v1/print_job
+============================================================
+Laptop timestamp: 15:14:15.676
+{
+  "datetime_cleaned": "",
+  "datetime_finished": "",
+  "datetime_started": "2026-10-21T19:05:51+00:00",
+  "material_0_usage": 639.0,
+  "material_1_usage": -1.0,
+  "name": "UMS3_AIl_In_One_3D_printer_test_nano_scaled_down_70.ufp",
+  "pause_source": "",
+  "progress": 0.19,
+  "reprint_original_uuid": "",
+  "result": "",
+  "source": "WEB_API",
+  "source_application": "Ultimaker Connect",
+  "source_user": "",
+  "state": "printing",
+  "time_elapsed": 243,
+  "time_estimated": 1308,
+  "time_total": 1303,
+  "used_hotend_types_0": [
+    {
+      "serial": "4535bf390000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_hotend_types_1": [
+    {
+      "serial": "0cbd393a0000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_materials_0_guid": [
+    {
+      "UUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+      "name": "Generic PLA Generic"
+    }
+  ],
+  "used_materials_1_guid": [],
+  "uuid": "7b2e1b11-e623-4aeb-aae1-b02c77a59c55"
+}
+
+============================================================
+/api/v1/printer
+============================================================
+Laptop timestamp: 15:14:16.132
+{
+  "bed": {
+    "pre_heat": {
+      "active": false
+    },
+    "temperature": {
+      "current": 60.0,
+      "target": 60.0
+    },
+    "type": "glass"
+  },
+  "diagnostics": {},
+  "heads": [
+    {
+      "acceleration": 2000.0,
+      "extruders": [
+        {
+          "active_material": {
+            "GUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "4535bf390000",
+            "statistics": {
+              "last_material_guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+              "material_extruded": 850010,
+              "max_temperature_exposed": 253,
+              "prints_since_cleaned": "118",
+              "time_spent_hot": 3985980
+            },
+            "temperature": {
+              "current": 201.7,
+              "target": 201.2
+            }
+          }
+        },
+        {
+          "active_material": {
+            "GUID": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": -0.7317073170731714,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "0cbd393a0000",
+            "statistics": {
+              "last_material_guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+              "material_extruded": 497560,
+              "max_temperature_exposed": 273,
+              "prints_since_cleaned": "61",
+              "time_spent_hot": 3376620
+            },
+            "temperature": {
+              "current": 45.8,
+              "target": 0.0
+            }
+          }
+        }
+      ],
+      "fan": 100.0,
+      "jerk": {
+        "x": 20.0,
+        "y": 20.0,
+        "z": 0.4
+      },
+      "max_speed": {
+        "x": 300.0,
+        "y": 300.0,
+        "z": 40.0
+      },
+      "position": {
+        "x": 117.582,
+        "y": 104.392,
+        "z": 2.2
+      }
+    }
+  ],
+  "led": {
+    "blink": {},
+    "brightness": 100.0,
+    "hue": 0.0,
+    "saturation": 0.0
+  },
+  "network": {
+    "ethernet": {
+      "connected": false,
+      "enabled": false
+    },
+    "wifi": {
+      "connected": true,
+      "enabled": true,
+      "mode": "WIRELESS",
+      "ssid": "UM-NO-HOTSPOT-NAME-SET"
+    },
+    "wifi_networks": [
+      {
+        "SSID": "wahoo",
+        "connected": true,
+        "security_required": false,
+        "strength": 73
+      },
+      {
+        "SSID": "UVA Guest",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "UVA WiFi Setup",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "eduroam",
+        "connected": false,
+        "security_required": true,
+        "strength": 63
+      },
+      {
+        "SSID": "DIRECT-68-HP M277 LaserJet",
+        "connected": false,
+        "security_required": true,
+        "strength": 50
+      }
+    ]
+  },
+  "status": "printing",
+  "validate_header": {}
+}
+
+============================================================
+/api/v1/print_job
+============================================================
+Laptop timestamp: 15:14:17.223
+{
+  "datetime_cleaned": "",
+  "datetime_finished": "",
+  "datetime_started": "2026-10-21T19:05:51+00:00",
+  "material_0_usage": 639.0,
+  "material_1_usage": -1.0,
+  "name": "UMS3_AIl_In_One_3D_printer_test_nano_scaled_down_70.ufp",
+  "pause_source": "",
+  "progress": 0.19,
+  "reprint_original_uuid": "",
+  "result": "",
+  "source": "WEB_API",
+  "source_application": "Ultimaker Connect",
+  "source_user": "",
+  "state": "printing",
+  "time_elapsed": 243,
+  "time_estimated": 1308,
+  "time_total": 1303,
+  "used_hotend_types_0": [
+    {
+      "serial": "4535bf390000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_hotend_types_1": [
+    {
+      "serial": "0cbd393a0000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_materials_0_guid": [
+    {
+      "UUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+      "name": "Generic PLA Generic"
+    }
+  ],
+  "used_materials_1_guid": [],
+  "uuid": "7b2e1b11-e623-4aeb-aae1-b02c77a59c55"
+}
+
+============================================================
+/api/v1/printer
+============================================================
+Laptop timestamp: 15:14:17.665
+{
+  "bed": {
+    "pre_heat": {
+      "active": false
+    },
+    "temperature": {
+      "current": 60.0,
+      "target": 60.0
+    },
+    "type": "glass"
+  },
+  "diagnostics": {},
+  "heads": [
+    {
+      "acceleration": 2000.0,
+      "extruders": [
+        {
+          "active_material": {
+            "GUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "4535bf390000",
+            "statistics": {
+              "last_material_guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+              "material_extruded": 850010,
+              "max_temperature_exposed": 253,
+              "prints_since_cleaned": "118",
+              "time_spent_hot": 3985980
+            },
+            "temperature": {
+              "current": 201.7,
+              "target": 201.2
+            }
+          }
+        },
+        {
+          "active_material": {
+            "GUID": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": -0.7317073170731714,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "0cbd393a0000",
+            "statistics": {
+              "last_material_guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+              "material_extruded": 497560,
+              "max_temperature_exposed": 273,
+              "prints_since_cleaned": "61",
+              "time_spent_hot": 3376620
+            },
+            "temperature": {
+              "current": 45.7,
+              "target": 0.0
+            }
+          }
+        }
+      ],
+      "fan": 100.0,
+      "jerk": {
+        "x": 20.0,
+        "y": 20.0,
+        "z": 0.4
+      },
+      "max_speed": {
+        "x": 300.0,
+        "y": 300.0,
+        "z": 40.0
+      },
+      "position": {
+        "x": 114.18,
+        "y": 106.315,
+        "z": 2.2
+      }
+    }
+  ],
+  "led": {
+    "blink": {},
+    "brightness": 100.0,
+    "hue": 0.0,
+    "saturation": 0.0
+  },
+  "network": {
+    "ethernet": {
+      "connected": false,
+      "enabled": false
+    },
+    "wifi": {
+      "connected": true,
+      "enabled": true,
+      "mode": "WIRELESS",
+      "ssid": "UM-NO-HOTSPOT-NAME-SET"
+    },
+    "wifi_networks": [
+      {
+        "SSID": "wahoo",
+        "connected": true,
+        "security_required": false,
+        "strength": 73
+      },
+      {
+        "SSID": "UVA Guest",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "UVA WiFi Setup",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "eduroam",
+        "connected": false,
+        "security_required": true,
+        "strength": 63
+      },
+      {
+        "SSID": "DIRECT-68-HP M277 LaserJet",
+        "connected": false,
+        "security_required": true,
+        "strength": 50
+      }
+    ]
+  },
+  "status": "printing",
+  "validate_header": {}
+}
+
+============================================================
+/api/v1/print_job
+============================================================
+Laptop timestamp: 15:14:18.764
+{
+  "datetime_cleaned": "",
+  "datetime_finished": "",
+  "datetime_started": "2026-10-21T19:05:51+00:00",
+  "material_0_usage": 639.0,
+  "material_1_usage": -1.0,
+  "name": "UMS3_AIl_In_One_3D_printer_test_nano_scaled_down_70.ufp",
+  "pause_source": "",
+  "progress": 0.19,
+  "reprint_original_uuid": "",
+  "result": "",
+  "source": "WEB_API",
+  "source_application": "Ultimaker Connect",
+  "source_user": "",
+  "state": "printing",
+  "time_elapsed": 243,
+  "time_estimated": 1308,
+  "time_total": 1303,
+  "used_hotend_types_0": [
+    {
+      "serial": "4535bf390000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_hotend_types_1": [
+    {
+      "serial": "0cbd393a0000",
+      "type": "AA 0.4"
+    }
+  ],
+  "used_materials_0_guid": [
+    {
+      "UUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+      "name": "Generic PLA Generic"
+    }
+  ],
+  "used_materials_1_guid": [],
+  "uuid": "7b2e1b11-e623-4aeb-aae1-b02c77a59c55"
+}
+
+============================================================
+/api/v1/printer
+============================================================
+Laptop timestamp: 15:14:19.292
+{
+  "bed": {
+    "pre_heat": {
+      "active": false
+    },
+    "temperature": {
+      "current": 60.0,
+      "target": 60.0
+    },
+    "type": "glass"
+  },
+  "diagnostics": {},
+  "heads": [
+    {
+      "acceleration": 2000.0,
+      "extruders": [
+        {
+          "active_material": {
+            "GUID": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": 0.0,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "4535bf390000",
+            "statistics": {
+              "last_material_guid": "506c9f0d-e3aa-4bd4-b2d2-23e2425b1aa9",
+              "material_extruded": 850010,
+              "max_temperature_exposed": 253,
+              "prints_since_cleaned": "118",
+              "time_spent_hot": 3985980
+            },
+            "temperature": {
+              "current": 201.5,
+              "target": 201.2
+            }
+          }
+        },
+        {
+          "active_material": {
+            "GUID": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+            "length_remaining": -1.0
+          },
+          "feeder": {
+            "acceleration": 3000.0,
+            "jerk": 5.0,
+            "max_speed": 45.0
+          },
+          "hotend": {
+            "id": "AA 0.4",
+            "offset": {
+              "state": "valid",
+              "x": -0.7317073170731714,
+              "y": 0.0,
+              "z": 0.0
+            },
+            "revision": "1",
+            "serial": "0cbd393a0000",
+            "statistics": {
+              "last_material_guid": "7e6207c4-22ff-441a-b261-ff89f166d6a0",
+              "material_extruded": 497560,
+              "max_temperature_exposed": 273,
+              "prints_since_cleaned": "61",
+              "time_spent_hot": 3376620
+            },
+            "temperature": {
+              "current": 45.6,
+              "target": 0.0
+            }
+          }
+        }
+      ],
+      "fan": 100.0,
+      "jerk": {
+        "x": 20.0,
+        "y": 20.0,
+        "z": 0.4
+      },
+      "max_speed": {
+        "x": 300.0,
+        "y": 300.0,
+        "z": 40.0
+      },
+      "position": {
+        "x": 117.296,
+        "y": 109.763,
+        "z": 2.2
+      }
+    }
+  ],
+  "led": {
+    "blink": {},
+    "brightness": 100.0,
+    "hue": 0.0,
+    "saturation": 0.0
+  },
+  "network": {
+    "ethernet": {
+      "connected": false,
+      "enabled": false
+    },
+    "wifi": {
+      "connected": true,
+      "enabled": true,
+      "mode": "WIRELESS",
+      "ssid": "UM-NO-HOTSPOT-NAME-SET"
+    },
+    "wifi_networks": [
+      {
+        "SSID": "wahoo",
+        "connected": true,
+        "security_required": false,
+        "strength": 73
+      },
+      {
+        "SSID": "UVA Guest",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "UVA WiFi Setup",
+        "connected": false,
+        "security_required": false,
+        "strength": 64
+      },
+      {
+        "SSID": "eduroam",
+        "connected": false,
+        "security_required": true,
+        "strength": 63
+      },
+      {
+        "SSID": "DIRECT-68-HP M277 LaserJet",
+        "connected": false,
+        "security_required": true,
+        "strength": 50
+      }
+    ]
+  },
+  "status": "printing",
+  "validate_header": {}
+}
