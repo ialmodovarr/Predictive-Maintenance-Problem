@@ -179,10 +179,9 @@ def stop_printer():
 # --------------------------------------------------
 # GET PRINTER DATA
 # --------------------------------------------------
-# Create a new output file every 10 seconds
-FILE_ROTATION_SECONDS = 10
-
+# One timestamped output file is created per script run.
 POLL_INTERVAL_SECONDS = 1
+
 
 def main():
     endpoints = [
@@ -190,102 +189,57 @@ def main():
         "/api/v1/printer",
     ]
 
-    # Get the folder containing your Python script (data)
+    # Get the folder containing this script (the data directory).
     data_dir = Path(__file__).resolve().parent
-
-    # Navigate into api_data
     api_dir = data_dir / "api_data"
-
-    # Create the folder if it doesn't exist
     api_dir.mkdir(parents=True, exist_ok=True)
 
+    # Create ONE timestamped log file when the script starts.
+    run_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+    output_file = api_dir / f"api_data_{run_timestamp}.txt"
 
-    output_file = None
-    file = None
-    next_rotation = 0
+    print(f"Collecting printer data every {POLL_INTERVAL_SECONDS} second(s).")
+    print(f"Writing all data for this run to: {output_file}")
 
     try:
-        while True:
-            current_time = time.monotonic()
+        # Keep this file open for the entire run; do not rotate files.
+        with open(output_file, "w", encoding="utf-8", buffering=1) as file:
+            file.write(f"Printer data collection started: {datetime.now()}\n")
+            file.write("=" * 60 + "\n")
 
-            # Create a new file when needed
-            if file is None or current_time >= next_rotation:
-
-                # Close the previous file before creating a new one
-                if file is not None:
-                    file.close()
-
-                # Generate a timestamped filename
-                run_timestamp = datetime.now().strftime(
-                    "%Y-%m-%d_%H-%M-%S-%f"
-                )
-
-                output_file = (
-                    api_dir / f"api_data_{run_timestamp}.txt"
-                )
-
-                file = open(
-                    output_file,
-                    "w",
-                    encoding="utf-8",
-                    buffering=1
-                )
-
-                file.write(
-                    f"Printer data collection started: {datetime.now()}\n"
-                )
-                file.write("=" * 60 + "\n")
-
-                print(f"Writing to: {output_file}")
-
-                # Schedule the next file rotation
-                next_rotation = (
-                    time.monotonic() + FILE_ROTATION_SECONDS
-                )
-
-            # Collect printer data
-            for endpoint in endpoints:
-                header = (
-                    "\n" + "=" * 60 + "\n"
-                    + endpoint + "\n"
-                    + "=" * 60
-                )
-
-                print(header, file=file)
-
-                try:
-                    data = digest_get(endpoint)
-
-                    timestamp = datetime.now().strftime(
-                        "%H:%M:%S.%f"
-                    )[:-3]
-
-                    output = (
-                        f"Laptop timestamp: {timestamp}\n"
-                        + json.dumps(data, indent=2)
+            while True:
+                for endpoint in endpoints:
+                    header = (
+                        "\n" + "=" * 60 + "\n"
+                        + endpoint + "\n"
+                        + "=" * 60 + "\n"
                     )
+                    file.write(header)
 
-                except requests.HTTPError as e:
-                    output = (
-                        f"HTTP error: {e}\n"
-                        f"Response: {e.response.text}"
-                    )
+                    try:
+                        data = digest_get(endpoint)
+                        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+                        output = (
+                            f"Laptop timestamp: {timestamp}\n"
+                            + json.dumps(data, indent=2)
+                        )
+                    except requests.HTTPError as exc:
+                        response_text = (
+                            exc.response.text if exc.response is not None else str(exc)
+                        )
+                        output = f"HTTP error: {exc}\nResponse: {response_text}"
+                    except Exception as exc:
+                        output = f"Error: {exc}"
 
-                except Exception as e:
-                    output = f"Error: {e}"
+                    file.write(output + "\n")
+                    file.flush()
 
-                print(output, file=file, flush=True)
-
-            # Wait before the next polling cycle
-            time.sleep(POLL_INTERVAL_SECONDS)
+                time.sleep(POLL_INTERVAL_SECONDS)
 
     except KeyboardInterrupt:
         print("\nData collection stopped.")
-
     finally:
-        if file is not None:
-            file.close()
-            print(f"Closed file: {output_file}")
+        print(f"Closed file: {output_file}")
 
 
 if __name__ == "__main__":
