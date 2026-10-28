@@ -63,15 +63,15 @@ Same 4 pins as the ADXL345 guide. Use the **inner black headers**, never the dou
 | Yellow | **SCL / D15** (PB8) | Right inner header, top hole |
 | Blue | **SDA / D14** (PB9) | Right inner header, 2nd hole |
 
-![Where the 4 wires go on the Nucleo (photo from the ADXL345 guide).](images/nucleo_pins.jpg){width="4.4in"}
+![Where the 4 wires go on the Nucleo (photo from the ADXL345 guide).](nucleo_pins.jpg){width="4.4in"}
 
 ### The breadboard map
 
 Hold the breadboard with the numbers running **60 on the left to 1 on the right**, letters **a to e** on the top half. Every hole along a long red **\+** or blue **−** rail is connected. In the middle, each numbered column is two separate groups of 5 holes (a to e, and f to j), split by the center gap.
 
-![Our breadboard: full-size, 60 columns, power rails top and bottom.](images/breadboard.jpg){width="5.2in"}
+![Our breadboard: full-size, 60 columns, power rails top and bottom.](breadboard.jpg){width="5.2in"}
 
-![Exactly where every wire goes. Dashed wires: the MCP9600, plug in when the replacement arrives.](images/breadboard_wiring.png){width="6.2in"}
+![Exactly where every wire goes. Dashed wires: the MCP9600, plug in when the replacement arrives.](breadboard_wiring.png){width="6.2in"}
 
 | From | To (breadboard) |
 | :---- | :---- |
@@ -93,7 +93,7 @@ On the MCP9600, read the printed pin labels (VIN, GND, SCL, SDA) and ignore the 
 - **AS5600 flow sensor:** on the filament path at the back of the S3. Give it **its own cable** to the breadboard rather than chaining it through the ADXL345 on the moving head.  
 - **MCP9600:** the board stays near the breadboard; only the thermocouple wire goes to the hotend.
 
-![The ADXL345 on the print head.](images/mount_closeup.jpg){width="3.6in"}
+![The ADXL345 on the print head.](mount_closeup.jpg){width="3.6in"}
 
 ### Before you power on
 
@@ -141,7 +141,7 @@ Other options:
 
 **Press the black RESET button** on the Nucleo once. The startup checks print with `board:` in front:
 
-![Example of a good start (printer idle). Your numbers will differ slightly.](images/mac_run_example.png){width="6.2in"}
+![Example of a good start (printer idle). Your numbers will differ slightly.](mac_run_example.png){width="6.2in"}
 
 | Startup line | Good | If not |
 | :---- | :---- | :---- |
