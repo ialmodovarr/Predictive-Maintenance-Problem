@@ -2,12 +2,12 @@
 
 static HAL_StatusTypeDef write_reg(I2C_HandleTypeDef *hi2c, uint8_t reg, uint8_t val)
 {
-    return HAL_I2C_Mem_Write(hi2c, ADXL345_ADDR, reg, I2C_MEMADD_SIZE_8BIT, &val, 1, 100);
+    return HAL_I2C_Mem_Write(hi2c, ADXL345_ADDR, reg, I2C_MEMADD_SIZE_8BIT, &val, 1, ADXL345_TIMEOUT_MS);
 }
 
 HAL_StatusTypeDef adxl345_read_devid(I2C_HandleTypeDef *hi2c, uint8_t *id)
 {
-    return HAL_I2C_Mem_Read(hi2c, ADXL345_ADDR, ADXL345_REG_DEVID, I2C_MEMADD_SIZE_8BIT, id, 1, 100);
+    return HAL_I2C_Mem_Read(hi2c, ADXL345_ADDR, ADXL345_REG_DEVID, I2C_MEMADD_SIZE_8BIT, id, 1, ADXL345_TIMEOUT_MS);
 }
 
 HAL_StatusTypeDef adxl345_init(I2C_HandleTypeDef *hi2c)
@@ -30,7 +30,7 @@ HAL_StatusTypeDef adxl345_read_xyz(I2C_HandleTypeDef *hi2c, int16_t *x, int16_t 
 {
     uint8_t b[6];
     HAL_StatusTypeDef s = HAL_I2C_Mem_Read(hi2c, ADXL345_ADDR, ADXL345_REG_DATAX0,
-                                           I2C_MEMADD_SIZE_8BIT, b, 6, 100);
+                                           I2C_MEMADD_SIZE_8BIT, b, 6, ADXL345_TIMEOUT_MS);
     if (s != HAL_OK) return s;
 
     /* Little-endian: low byte first */
