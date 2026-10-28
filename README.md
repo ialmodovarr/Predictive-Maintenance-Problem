@@ -4,6 +4,8 @@
 
 **Last updated:** Oct 21, 2026 (Sofia) · **Status:** ADXL345 and AS5600 share one I2C bus on the breadboard, streaming at about 765 samples/s (800 Hz setting). MCP9600 is switched off in the firmware until the replacement arrives.
 
+You just need print_logger and requirements.txt to test the three sensors
+
 ## What this is
 
 Three sensors watch the UltiMaker S3 while it prints. All three talk to the same Nucleo board (STM32F446RE) over the same two I2C wires. The Nucleo sends one line of numbers 800 times a second over USB to a laptop. A Python script on the laptop records every line during a print and, when you stop it, saves a labeled Excel file plus a CSV with every sample. Those files are the training data for the ML model.
