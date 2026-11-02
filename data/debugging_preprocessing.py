@@ -180,9 +180,9 @@ LIMITS = {
     "bed_temp_target": (0.0, 150.0),
 
     # Printer-head position, mm; broad S3 build-envelope checks
-    "head_x_mm": (0.0, 230.0),
-    "head_y_mm": (0.0, 190.0),
-    "head_z_mm": (0.0, 200.0),
+    # "head_x_mm": (0.0, 230.0),
+    # "head_y_mm": (0.0, 190.0),
+    # "head_z_mm": (0.0, 200.0),
 
     # Motion settings. Broad nonnegative plausibility bounds
     "extruder1_jerk": (0.0, 1000.0),

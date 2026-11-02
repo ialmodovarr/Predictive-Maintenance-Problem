@@ -195,7 +195,7 @@ def main():
     api_dir.mkdir(parents=True, exist_ok=True)
 
     # Create ONE timestamped log file when the script starts.
-    run_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
+    run_timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     output_file = api_dir / f"api_data_{run_timestamp}.txt"
 
     print(f"Collecting printer data every {POLL_INTERVAL_SECONDS} second(s).")
@@ -218,7 +218,7 @@ def main():
 
                     try:
                         data = digest_get(endpoint)
-                        timestamp = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+                        timestamp = datetime.now().strftime("%H:%M:%S")[:-3]
                         output = (
                             f"Laptop timestamp: {timestamp}\n"
                             + json.dumps(data, indent=2)
