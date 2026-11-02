@@ -1,0 +1,7 @@
+row_index,laptop_time,metric,rejected_value,allowed_min,allowed_max,reason
+19,12:33,head_x_mm,-27.8,0.0,230.0,outside broad engineering sanity bounds
+20,12:33,head_x_mm,-27.8,0.0,230.0,outside broad engineering sanity bounds
+40,12:34,head_x_mm,-27.8,0.0,230.0,outside broad engineering sanity bounds
+19,12:33,head_y_mm,195.0,0.0,190.0,outside broad engineering sanity bounds
+20,12:33,head_y_mm,195.0,0.0,190.0,outside broad engineering sanity bounds
+40,12:34,head_y_mm,195.0,0.0,190.0,outside broad engineering sanity bounds
