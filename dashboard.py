@@ -189,9 +189,9 @@ def load_replay(file_bytes: bytes) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 FAULTS = {
     "none": "None (healthy)",
-    "clog": "Clog / jam (filament stops)",
-    "vibration": "Loose part / worn bearing (vibration jumps)",
-    "heater": "Heater fault (temperature drops)",
+    "clog": "Feeder: clog / jam (filament stops)",
+    "vibration": "Movement system: loose belt / motor (vibration jumps)",
+    "heater": "Nozzle: heater fault (temperature drops)",
 }
 
 
@@ -251,7 +251,7 @@ def predict(features: pd.DataFrame, cfg: dict) -> dict:
     Input:  features, a DataFrame with the summarize() columns, newest row last.
     Output: {"label": "HEALTHY" | "FAILING",
              "confidence": 0..1 or None,
-             "subsystems": {"Vibration": bool, "Filament flow": bool, "Hotend": bool | None},
+             "subsystems": {"Nozzle": bool | None, "Feeder": bool, "Movement system": bool},
              "source": short text shown under the status}
             subsystems maps each subsystem to True if it looks like it is failing
             (None = no data for it).
@@ -262,7 +262,7 @@ def predict(features: pd.DataFrame, cfg: dict) -> dict:
     recent = features.tail(cfg["persist_s"])
     if len(recent) < cfg["persist_s"]:
         return {"label": "HEALTHY", "confidence": None,
-                "subsystems": {"Vibration": False, "Filament flow": False, "Hotend": None},
+                "subsystems": {"Nozzle": None, "Feeder": False, "Movement system": False},
                 "source": "warming up"}
 
     printing = recent["vib_rms"] > cfg["printing_vib"]
@@ -274,7 +274,7 @@ def predict(features: pd.DataFrame, cfg: dict) -> dict:
     else:
         heat_bad = bool(printing.all() and ((temps - cfg["target_temp"]).abs() > cfg["temp_band"]).all())
 
-    subs = {"Vibration": vib_bad, "Filament flow": flow_bad, "Hotend": heat_bad}
+    subs = {"Nozzle": heat_bad, "Feeder": flow_bad, "Movement system": vib_bad}
     failing = any(v for v in subs.values())
     return {"label": "FAILING" if failing else "HEALTHY", "confidence": None,
             "subsystems": subs, "source": "placeholder rules (ML model not connected)"}
@@ -335,7 +335,7 @@ with st.sidebar.expander("Placeholder rule settings"):
         "vib_limit": st.number_input("Vibration limit (m/s², combined RMS)", value=1.5, step=0.1),
         "printing_vib": st.number_input("Printing if vibration above (m/s²)", value=0.3, step=0.05),
         "min_speed": st.number_input("Clog if filament speed below (mm/s)", value=0.2, step=0.05),
-        "target_temp": st.number_input("Hotend target (°C)", value=210.0, step=5.0),
+        "target_temp": st.number_input("Nozzle target (°C)", value=210.0, step=5.0),
         "temp_band": st.number_input("Allowed temp deviation (°C)", value=10.0, step=1.0),
         "persist_s": st.number_input("Must last this many seconds to count", value=5, min_value=1, step=1),
     }
@@ -470,9 +470,9 @@ def live_view():
           <div class="hero-src">{src}</div>
           {sparkline(win['vib_rms'].values)}
           <div class="hero-stats">
-            <div class="hero-stat"><div class="k">Vibration</div><div class="v">{last['vib_rms']:.2f} m/s²</div></div>
-            <div class="hero-stat"><div class="k">Filament speed</div><div class="v">{last['filament_speed_mm_s']:.2f} mm/s</div></div>
-            <div class="hero-stat"><div class="k">Hotend</div><div class="v">{stat_temp}</div></div>
+            <div class="hero-stat"><div class="k">Movement system</div><div class="v">{last['vib_rms']:.2f} m/s²</div></div>
+            <div class="hero-stat"><div class="k">Feeder</div><div class="v">{last['filament_speed_mm_s']:.2f} mm/s</div></div>
+            <div class="hero-stat"><div class="k">Nozzle</div><div class="v">{stat_temp}</div></div>
           </div>
         </div>""")
     with right:
@@ -499,19 +499,19 @@ def live_view():
     subs = result["subsystems"]
     c1, c2, c3 = st.columns(3, gap="medium")
     with c1, st.container(key="card_vib"):
-        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Vibration</span>{pill(subs.get('Vibration'))}</div>
+        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Movement system</span>{pill(subs.get('Movement system'))}</div>
              <div class="sub-val">{last['vib_rms']:.2f}<small>m/s² RMS</small></div>
-             <div class="sub-note">Print head, per axis · dashed line = alert limit</div></div>""")
+             <div class="sub-note">Accelerometer · motor + belt · dashed line = alert limit</div></div>""")
         st.altair_chart(chart(win, {"rms_x": "X", "rms_y": "Y", "rms_z": "Z"},
                               [BLUE_900, BLUE_500, BLUE_300], rule=cfg["vib_limit"]), width="stretch")
     with c2, st.container(key="card_flow"):
-        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Filament flow</span>{pill(subs.get('Filament flow'))}</div>
+        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Feeder</span>{pill(subs.get('Feeder'))}</div>
              <div class="sub-val">{last['filament_speed_mm_s']:.2f}<small>mm/s</small></div>
-             <div class="sub-note">{last['filament_total_mm']:.0f} mm fed this print · dips below 0 are retractions</div></div>""")
+             <div class="sub-note">{last['filament_total_mm']:.0f} mm fed · filament motion sensor</div></div>""")
         st.altair_chart(chart(win, {"filament_speed_mm_s": "Feed speed"}, [BLUE_700]), width="stretch")
     with c3, st.container(key="card_temp"):
         if temp_on:
-            html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Hotend</span>{pill(subs.get('Hotend'))}</div>
+            html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Nozzle</span>{pill(subs.get('Nozzle'))}</div>
                  <div class="sub-val">{last['temp_c']:.1f}<small>°C</small></div>
                  <div class="sub-note">Target {cfg['target_temp']:.0f} °C (dashed) · thermocouple</div></div>""")
             st.altair_chart(chart(win, {"temp_c": "Temperature"}, [BLUE_700], rule=cfg["target_temp"],
@@ -519,7 +519,7 @@ def live_view():
                                   domain=[min(cfg["target_temp"] - cfg["temp_band"] - 5, win["temp_c"].min()),
                                           max(cfg["target_temp"] + cfg["temp_band"] + 5, win["temp_c"].max())]), width="stretch")
         else:
-            html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Hotend</span>{pill(None)}</div>
+            html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Nozzle</span>{pill(None)}</div>
                  <div class="sub-val">off<small></small></div>
                  <div class="sub-note">Thermocouple</div>
                  <div class="offline">Thermocouple is switched off in the firmware<br>(MCP9600 replacement pending)</div></div>""")
