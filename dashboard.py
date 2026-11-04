@@ -1,0 +1,557 @@
+#!/usr/bin/env python3
+"""
+Printer health dashboard (Streamlit) for the 3D printer predictive maintenance capstone.
+
+Three data sources, picked in the sidebar:
+  Simulated    fake sensor data generated in the app, with buttons to inject a fault.
+               Works with no printer, no board and no model. Use it to build and demo the UI.
+  Replay CSV   plays back a recording made by print_logger.py, sped up if you like.
+  Live CSV     follows the CSV print_logger.py is writing during a print right now.
+               (Run the logger as usual; the dashboard only reads its file, so both can run
+               at once. Only one program can hold the serial port.)
+
+Model output is binary: HEALTHY or FAILING. Until the ML model exists, predict() below
+uses simple threshold rules as a stand-in. To plug in the real model, replace the body
+of predict() and keep its inputs and outputs the same.
+
+Setup (once):  python3 -m pip install streamlit pandas numpy
+Run:           python3 -m streamlit run dashboard.py
+               (run it from the folder that has the .streamlit/config.toml with the colors;
+               without it the app still works, just with Streamlit's default sidebar)
+"""
+import io
+import os
+import time
+
+import altair as alt
+import numpy as np
+import pandas as pd
+import streamlit as st
+
+G = 9.80665
+APPROX_RATE = 800          # samples per second from the board (real rate is about 765)
+BYTES_PER_ROW = 100        # rough size of one line of the logger CSV, used to tail the file
+
+st.set_page_config(page_title="Printer Health", page_icon="🖨️", layout="wide")
+
+# ---------------------------------------------------------------------------
+# Look and feel (blue palette). Colors for the sidebar, widgets and font also live in
+# .streamlit/config.toml next to this file; this CSS styles the cards and custom pieces.
+# ---------------------------------------------------------------------------
+NAVY = "#0B1F3A"
+BLUE_900 = "#1E3A8A"
+BLUE_700 = "#1D4ED8"
+BLUE_500 = "#3B82F6"
+BLUE_300 = "#93C5FD"
+BLUE_100 = "#DBEAFE"
+INK = "#0F172A"
+MUTED = "#64748B"
+RED = "#DC2626"
+FONT = "Plus Jakarta Sans"
+
+st.markdown(f"""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+header[data-testid="stHeader"] {{ background: transparent; }}
+.block-container {{ padding-top: 2.2rem; padding-bottom: 2rem; max-width: 1450px; }}
+
+/* white rounded cards (st.container with a key starting "card") */
+div[class*="st-key-card"] {{
+  background: #FFFFFF; border-radius: 22px; padding: 20px 22px 10px 22px;
+  box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 10px 30px rgba(30,64,175,.07);
+}}
+
+.ph, .ph * {{ font-family: '{FONT}', sans-serif; }}
+.ph-top {{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: 18px; }}
+.ph-title {{ font-size: 2.1rem; font-weight: 800; color: {INK}; letter-spacing: -.02em; line-height: 1.1; }}
+.ph-sub {{ color: {MUTED}; font-size: .95rem; margin-top: 4px; }}
+.ph-chip {{ display:inline-flex; align-items:center; gap:8px; background:#FFFFFF; color:{INK};
+  border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: .9rem;
+  box-shadow: 0 1px 2px rgba(15,23,42,.05), 0 6px 16px rgba(30,64,175,.06); }}
+.dot {{ width:8px; height:8px; border-radius:50%; display:inline-block; }}
+
+/* hero status card */
+.hero {{ border-radius: 24px; padding: 24px 28px 22px 28px; color: #FFFFFF; position: relative; overflow: hidden;
+  box-shadow: 0 14px 34px rgba(29,78,216,.28); min-height: 300px; }}
+.hero.ok  {{ background: linear-gradient(135deg, {BLUE_900} 0%, {BLUE_700} 50%, #60A5FA 100%); }}
+.hero.bad {{ background: linear-gradient(135deg, #7F1D1D 0%, {RED} 55%, #F87171 100%);
+  box-shadow: 0 14px 34px rgba(220,38,38,.30); }}
+.hero-row {{ display:flex; justify-content:space-between; align-items:center; }}
+.hero-label {{ font-size: .95rem; font-weight: 600; opacity: .9; }}
+.hero-phase {{ background: rgba(255,255,255,.18); border-radius: 999px; padding: 5px 12px; font-size: .82rem; font-weight: 600; }}
+.hero-status {{ font-size: 3.2rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; margin-top: 10px; }}
+.hero-src {{ font-size: .85rem; opacity: .8; margin-top: 2px; }}
+.hero svg {{ display:block; width:100%; height:70px; margin: 10px 0 8px 0; }}
+.hero-stats {{ display:flex; gap: 0; border-top: 1px solid rgba(255,255,255,.22); padding-top: 14px; }}
+.hero-stat {{ flex:1; padding-right: 12px; }}
+.hero-stat + .hero-stat {{ border-left: 1px solid rgba(255,255,255,.22); padding-left: 16px; }}
+.hero-stat .k {{ font-size: .8rem; opacity: .8; }}
+.hero-stat .v {{ font-size: 1.25rem; font-weight: 700; margin-top: 2px; }}
+
+/* small tiles on the right */
+.tile {{ background:#FFFFFF; border-radius: 20px; padding: 16px 18px; margin-bottom: 14px; display:flex; gap: 14px; align-items:center;
+  box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 10px 30px rgba(30,64,175,.07); }}
+.tile:last-child {{ margin-bottom: 0; }}
+.tile-icon {{ width: 52px; height: 52px; border-radius: 14px; background: {BLUE_100}; color: {BLUE_700};
+  display:flex; align-items:center; justify-content:center; font-weight: 800; font-size: 1.05rem; flex: none; }}
+.tile-icon.bad {{ background: #FEE2E2; color: {RED}; }}
+.tile-body {{ flex: 1; min-width: 0; }}
+.tile-k {{ color: {MUTED}; font-size: .82rem; font-weight: 600; }}
+.tile-v {{ color: {INK}; font-size: 1.35rem; font-weight: 800; }}
+.bar {{ height: 7px; background: #E8EEF9; border-radius: 999px; margin-top: 8px; overflow: hidden; }}
+.bar > span {{ display:block; height:100%; border-radius: 999px; background: linear-gradient(90deg, {BLUE_700}, {BLUE_500}); }}
+
+/* subsystem card header */
+.sub-head {{ display:flex; justify-content:space-between; align-items:center; }}
+.sub-title {{ font-weight: 700; color: {INK}; font-size: 1.05rem; }}
+.sub-val {{ font-size: 2rem; font-weight: 800; color: {INK}; letter-spacing: -.02em; margin-top: 6px; }}
+.sub-val small {{ font-size: .95rem; font-weight: 600; color: {MUTED}; margin-left: 4px; }}
+.sub-note {{ color: {MUTED}; font-size: .82rem; margin-top: 2px; }}
+.pill {{ border-radius: 999px; padding: 4px 12px; font-size: .75rem; font-weight: 700; letter-spacing: .04em; }}
+.pill.ok {{ background: {BLUE_100}; color: {BLUE_700}; }}
+.pill.bad {{ background: #FEE2E2; color: #B91C1C; }}
+.pill.na {{ background: #E2E8F0; color: {MUTED}; }}
+.offline {{ height: 190px; display:flex; align-items:center; justify-content:center; text-align:center;
+  color: {MUTED}; font-size: .9rem; background: #F5F8FD; border-radius: 14px; margin: 12px 0 14px 0; padding: 0 20px; }}
+
+/* alerts list */
+.al-head {{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px; }}
+.al-title {{ font-weight: 700; color: {INK}; font-size: 1.05rem; }}
+.al-row {{ display:flex; align-items:center; gap: 14px; padding: 12px 4px; border-top: 1px solid #EEF2F9; }}
+.al-icon {{ width: 36px; height: 36px; border-radius: 10px; display:flex; align-items:center; justify-content:center; font-weight: 800; flex: none; }}
+.al-icon.bad {{ background: #FEE2E2; color: {RED}; }}
+.al-icon.ok {{ background: {BLUE_100}; color: {BLUE_700}; }}
+.al-main {{ flex: 1; }}
+.al-main b {{ color: {INK}; font-weight: 700; }}
+.al-main div {{ color: {MUTED}; font-size: .8rem; }}
+.al-time {{ color: {MUTED}; font-size: .85rem; font-variant-numeric: tabular-nums; }}
+.al-empty {{ color: {MUTED}; font-size: .9rem; padding: 14px 4px 18px 4px; border-top: 1px solid #EEF2F9; }}
+</style>
+""", unsafe_allow_html=True)
+
+
+def html(s: str):
+    """Render custom HTML. Lines are stripped so Markdown never turns indented HTML into a code block."""
+    st.markdown("\n".join(line.strip() for line in s.splitlines() if line.strip()), unsafe_allow_html=True)
+
+
+# ---------------------------------------------------------------------------
+# Turning raw logger samples into one row per second
+# ---------------------------------------------------------------------------
+def summarize(raw: pd.DataFrame) -> pd.DataFrame:
+    """Raw print_logger.py samples -> one row per second (same idea as its Summary sheet).
+
+    Columns out: time_s, rms_x, rms_y, rms_z, vib_rms (m/s^2, gravity removed),
+    filament_total_mm, filament_speed_mm_s, temp_c.
+    """
+    suf = "m_s2" if "accel_x_m_s2" in raw.columns else "g"
+    scale = 1.0 if suf == "m_s2" else G          # always show m/s^2
+    raw = raw.dropna(subset=["time_s"])
+    sec = np.floor(raw["time_s"]).astype(int)
+    out = pd.DataFrame(index=pd.Index(sorted(sec.unique()), name="time_s"))
+    for a in "xyz":
+        # std inside each second = shaking with gravity and slow tilt removed
+        out[f"rms_{a}"] = (raw[f"accel_{a}_{suf}"] * scale).groupby(sec).std(ddof=0)
+    out["vib_rms"] = np.sqrt(out.rms_x ** 2 + out.rms_y ** 2 + out.rms_z ** 2)
+    fil = raw["filament_mm"].groupby(sec).last()
+    out["filament_total_mm"] = fil
+    out["filament_speed_mm_s"] = fil.diff().fillna(0.0)
+    temp = pd.to_numeric(raw.get("hotend_temp_C"), errors="coerce")
+    out["temp_c"] = temp.groupby(sec).mean() if temp is not None else np.nan
+    return out.reset_index()
+
+
+def tail_csv(path: str, seconds: float) -> pd.DataFrame:
+    """Read only the last few seconds of a (possibly huge, still growing) logger CSV."""
+    with open(path, "rb") as f:
+        header = f.readline()
+        f.seek(0, os.SEEK_END)
+        size = f.tell()
+        start = max(len(header), size - int(seconds * APPROX_RATE * BYTES_PER_ROW))
+        f.seek(start)
+        data = f.read()
+    if start > len(header):                      # landed mid-line: drop the partial first line
+        data = data.split(b"\n", 1)[-1]
+    if not data.endswith(b"\n"):                 # logger may be mid-write: drop the partial last line
+        data = data.rsplit(b"\n", 1)[0] + b"\n"
+    return pd.read_csv(io.BytesIO(header + data))
+
+
+@st.cache_data(show_spinner="Summarizing recording...")
+def load_replay(file_bytes: bytes) -> pd.DataFrame:
+    cols = lambda c: c in ("time_s", "filament_mm", "hotend_temp_C") or c.startswith("accel_") and not c.endswith("counts")
+    raw = pd.read_csv(io.BytesIO(file_bytes), usecols=cols)
+    return summarize(raw)
+
+
+# ---------------------------------------------------------------------------
+# Simulated data (healthy printing, plus injectable faults)
+# ---------------------------------------------------------------------------
+FAULTS = {
+    "none": "None (healthy)",
+    "clog": "Clog / jam (filament stops)",
+    "vibration": "Loose part / worn bearing (vibration jumps)",
+    "heater": "Heater fault (temperature drops)",
+}
+
+
+def sim_step(state: dict) -> dict:
+    """Make one new per-second row of fake data."""
+    rng = np.random.default_rng()
+    t = state["t"]
+    printing = t >= 30                            # 30 s idle baseline, like the recording rules
+    fault = state["fault"] if printing else "none"
+
+    if printing:
+        rms = np.abs(rng.normal([0.45, 0.40, 0.25], 0.06))
+        speed = max(0.0, rng.normal(1.6, 0.35))
+        if rng.random() < 0.05:                   # occasional retraction
+            speed = -rng.uniform(0.5, 1.5)
+        target = 210.0
+    else:
+        rms = np.abs(rng.normal([0.04, 0.04, 0.03], 0.01))
+        speed = 0.0
+        target = 210.0
+
+    secs_in = t - state["fault_start"] if state["fault_start"] is not None else 0
+    if fault == "clog":
+        speed = abs(rng.normal(0, 0.03))
+    elif fault == "vibration":
+        rms = rms * (2.5 + 0.02 * secs_in)
+    elif fault == "heater":
+        target = max(170.0, 210.0 - 1.5 * secs_in)
+
+    state["temp"] += 0.3 * (target - state["temp"]) + rng.normal(0, 0.25)
+    state["fil"] += speed
+    row = {
+        "time_s": t,
+        "rms_x": rms[0], "rms_y": rms[1], "rms_z": rms[2],
+        "vib_rms": float(np.sqrt((rms ** 2).sum())),
+        "filament_total_mm": state["fil"],
+        "filament_speed_mm_s": speed,
+        "temp_c": state["temp"],
+    }
+    state["t"] += 1
+    return row
+
+
+def sim_state() -> dict:
+    if "sim" not in st.session_state:
+        st.session_state.sim = {"t": 0, "fil": 0.0, "temp": 210.0, "fault": "none",
+                                "fault_start": None, "rows": []}
+    return st.session_state.sim
+
+
+# ---------------------------------------------------------------------------
+# Model: HEALTHY / FAILING
+# ---------------------------------------------------------------------------
+def predict(features: pd.DataFrame, cfg: dict) -> dict:
+    """Decide HEALTHY or FAILING from the last few seconds of per-second features.
+
+    Input:  features, a DataFrame with the summarize() columns, newest row last.
+    Output: {"label": "HEALTHY" | "FAILING",
+             "confidence": 0..1 or None,
+             "subsystems": {"Vibration": bool, "Filament flow": bool, "Hotend": bool | None},
+             "source": short text shown under the status}
+            subsystems maps each subsystem to True if it looks like it is failing
+            (None = no data for it).
+
+    PLACEHOLDER: threshold rules. Bella / Austin: replace this body with the real model
+    (e.g. model.predict on features built from the same columns) and return the same dict.
+    """
+    recent = features.tail(cfg["persist_s"])
+    if len(recent) < cfg["persist_s"]:
+        return {"label": "HEALTHY", "confidence": None,
+                "subsystems": {"Vibration": False, "Filament flow": False, "Hotend": None},
+                "source": "warming up"}
+
+    printing = recent["vib_rms"] > cfg["printing_vib"]
+    vib_bad = bool((recent["vib_rms"] > cfg["vib_limit"]).all())
+    flow_bad = bool(printing.all() and (recent["filament_speed_mm_s"].abs() < cfg["min_speed"]).all())
+    temps = recent["temp_c"].dropna()
+    if len(temps) < len(recent):
+        heat_bad = None                           # thermocouple off / missing
+    else:
+        heat_bad = bool(printing.all() and ((temps - cfg["target_temp"]).abs() > cfg["temp_band"]).all())
+
+    subs = {"Vibration": vib_bad, "Filament flow": flow_bad, "Hotend": heat_bad}
+    failing = any(v for v in subs.values())
+    return {"label": "FAILING" if failing else "HEALTHY", "confidence": None,
+            "subsystems": subs, "source": "placeholder rules (ML model not connected)"}
+
+
+def update_alerts(result: dict, t: float):
+    """Log an alert the moment a subsystem flips to failing, and when it recovers."""
+    log = st.session_state.setdefault("alerts", [])
+    prev = st.session_state.setdefault("prev_subs", {})
+    for name, bad in result["subsystems"].items():
+        if bad is None:
+            continue
+        if bad and not prev.get(name):
+            log.insert(0, {"time_s": int(t), "clock": time.strftime("%H:%M:%S"),
+                           "subsystem": name, "event": "FAILING"})
+        elif not bad and prev.get(name):
+            log.insert(0, {"time_s": int(t), "clock": time.strftime("%H:%M:%S"),
+                           "subsystem": name, "event": "back to healthy"})
+        prev[name] = bad
+
+
+# ---------------------------------------------------------------------------
+# Sidebar
+# ---------------------------------------------------------------------------
+st.sidebar.title("Printer Health")
+source = st.sidebar.radio("Data source", ["Simulated", "Replay CSV", "Live CSV"])
+window_s = st.sidebar.slider("Chart window (seconds)", 30, 600, 120, step=30)
+
+if source == "Simulated":
+    sim = sim_state()
+    choice = st.sidebar.selectbox("Inject fault", list(FAULTS), format_func=FAULTS.get,
+                                  index=list(FAULTS).index(sim["fault"]))
+    if choice != sim["fault"]:
+        sim["fault"] = choice
+        sim["fault_start"] = sim["t"] if choice != "none" else None
+    if st.sidebar.button("Restart simulation"):
+        del st.session_state["sim"]
+        st.session_state.pop("alerts", None)
+        st.session_state.pop("prev_subs", None)
+        st.session_state.pop("hist", None)
+        st.rerun()
+    st.sidebar.caption("First 30 s is idle, then printing starts. Faults take effect once printing.")
+elif source == "Replay CSV":
+    up = st.sidebar.file_uploader("Recording from print_logger.py (.csv)", type="csv")
+    speed_x = st.sidebar.select_slider("Playback speed", [1, 2, 5, 10, 30, 60], value=10)
+    if up is not None and st.session_state.get("replay_name") != up.name:
+        st.session_state.replay_name = up.name
+        st.session_state.replay_pos = 0
+        st.session_state.pop("alerts", None)
+        st.session_state.pop("prev_subs", None)
+        st.session_state.pop("hist", None)
+else:
+    live_path = st.sidebar.text_input("Path to the CSV being recorded",
+                                      placeholder="e.g. ~/sensor_logs/print_20261103_190000.csv")
+
+with st.sidebar.expander("Placeholder rule settings"):
+    cfg = {
+        "vib_limit": st.number_input("Vibration limit (m/s², combined RMS)", value=1.5, step=0.1),
+        "printing_vib": st.number_input("Printing if vibration above (m/s²)", value=0.3, step=0.05),
+        "min_speed": st.number_input("Clog if filament speed below (mm/s)", value=0.2, step=0.05),
+        "target_temp": st.number_input("Hotend target (°C)", value=210.0, step=5.0),
+        "temp_band": st.number_input("Allowed temp deviation (°C)", value=10.0, step=1.0),
+        "persist_s": st.number_input("Must last this many seconds to count", value=5, min_value=1, step=1),
+    }
+    st.caption("These only matter until the ML model replaces predict().")
+
+
+# ---------------------------------------------------------------------------
+# Main view (refreshes every second)
+# ---------------------------------------------------------------------------
+def get_features():
+    """Return (per-second DataFrame up to now, message or None)."""
+    if source == "Simulated":
+        sim = sim_state()
+        sim["rows"].append(sim_step(sim))
+        sim["rows"] = sim["rows"][-1200:]
+        return pd.DataFrame(sim["rows"]), None
+    if source == "Replay CSV":
+        if up is None:
+            return None, "Upload a CSV from print_logger.py in the sidebar."
+        df = load_replay(up.getvalue())
+        pos = st.session_state.get("replay_pos", 0) + speed_x
+        st.session_state.replay_pos = min(pos, len(df))
+        if st.session_state.replay_pos >= len(df):
+            st.toast("End of recording")
+        return df.iloc[: st.session_state.replay_pos], None
+    path = os.path.expanduser(live_path or "")
+    if not path:
+        return None, "Enter the path of the CSV that print_logger.py is writing."
+    if not os.path.exists(path):
+        return None, f"File not found: {path}"
+    try:
+        raw = tail_csv(path, window_s + 2)
+    except Exception as e:                        # e.g. logger just started, file still empty
+        return None, f"Waiting for data ({e})"
+    if raw.empty:
+        return None, "Waiting for data..."
+    df = summarize(raw)
+    return df.iloc[:-1] if len(df) > 1 else df, None   # last second is usually incomplete
+
+
+def sparkline(values, w=600, h=70) -> str:
+    """Small white trend line for the hero card, as inline SVG."""
+    v = np.asarray(values, dtype=float)
+    v = v[~np.isnan(v)]
+    if len(v) < 2:
+        return ""
+    lo, hi = v.min(), v.max()
+    rng = hi - lo if hi > lo else 1.0
+    xs = np.linspace(0, w, len(v))
+    ys = h - 6 - (v - lo) / rng * (h - 12)
+    pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in zip(xs, ys))
+    area = f"0,{h} {pts} {w},{h}"
+    return (f"<svg viewBox='0 0 {w} {h}' preserveAspectRatio='none'>"
+            f"<polygon points='{area}' fill='rgba(255,255,255,.12)'/>"
+            f"<polyline points='{pts}' fill='none' stroke='white' stroke-width='2.2' "
+            f"stroke-linejoin='round' vector-effect='non-scaling-stroke'/></svg>")
+
+
+def chart(win: pd.DataFrame, cols: dict, colors: list, rule=None, zero=True, area=True, domain=None):
+    """Blue Altair chart for a subsystem card. cols maps column name -> legend label."""
+    d = win.reset_index()[["time_s", *cols]].rename(columns=cols)
+    d = d.melt("time_s", list(cols.values()), "series", "value")
+    multi = len(cols) > 1
+    x = alt.X("time_s:Q", title=None, axis=alt.Axis(grid=False, tickCount=5, format="d"))
+    y = alt.Y("value:Q", title=None, scale=alt.Scale(zero=zero, nice=True, domain=domain) if domain else alt.Scale(zero=zero, nice=True), axis=alt.Axis(tickCount=4))
+    if multi:
+        layer = alt.Chart(d).mark_line(strokeWidth=2, interpolate="monotone").encode(
+            x=x, y=y, color=alt.Color("series:N", scale=alt.Scale(domain=list(cols.values()), range=colors),
+                                      legend=alt.Legend(orient="bottom", title=None, symbolType="circle")))
+    elif area:
+        grad = alt.Gradient(gradient="linear", x1=1, x2=1, y1=1, y2=0,
+                            stops=[alt.GradientStop(color="rgba(59,130,246,0.02)", offset=0),
+                                   alt.GradientStop(color="rgba(59,130,246,0.35)", offset=1)])
+        layer = alt.Chart(d).mark_area(line={"color": colors[0], "strokeWidth": 2}, color=grad,
+                                       interpolate="monotone").encode(x=x, y=y)
+    else:
+        layer = alt.Chart(d).mark_line(color=colors[0], strokeWidth=2.2, interpolate="monotone",
+                                       clip=True).encode(x=x, y=y)
+    if rule is not None:
+        layer = layer + alt.Chart(pd.DataFrame({"v": [rule]})).mark_rule(
+            color="#F87171", strokeDash=[5, 4], strokeWidth=1.5).encode(y="v:Q")
+    return (layer.properties(height=190)
+            .configure(background="transparent", font=f"{FONT}, -apple-system, Helvetica, Arial, sans-serif", padding={"left": 2, "right": 10, "top": 4, "bottom": 2})
+            .configure_view(strokeWidth=0)
+            .configure_axis(gridColor="#EEF2F9", domain=False, ticks=False,
+                            labelColor="#94A3B8", labelFontSize=11, labelPadding=6)
+            .configure_legend(labelColor=MUTED, labelFontSize=11))
+
+
+def pill(v) -> str:
+    if v is None:
+        return "<span class='pill na'>NO DATA</span>"
+    return "<span class='pill bad'>FAILING</span>" if v else "<span class='pill ok'>HEALTHY</span>"
+
+
+SOURCE_LABEL = {"Simulated": "Simulated data", "Replay CSV": "Replaying recording", "Live CSV": "Live from printer"}
+
+
+@st.fragment(run_every=1.0)
+def live_view():
+    df, msg = get_features()
+    if msg or df is None or df.empty:
+        header(None)
+        st.info(msg or "Waiting for data...")
+        return
+
+    result = predict(df, cfg)
+    t_now = df["time_s"].iloc[-1]
+    update_alerts(result, t_now)
+    failing = result["label"] == "FAILING"
+    hist = st.session_state.setdefault("hist", {})
+    hist[int(t_now)] = failing
+    last = df.iloc[-1]
+    win = df[df["time_s"] > t_now - window_s].set_index("time_s")
+    printing = last["vib_rms"] > cfg["printing_vib"]
+    temp_on = win["temp_c"].notna().any()
+    alerts = st.session_state.get("alerts", [])
+
+    header(printing)
+
+    # --- Row 1: hero status card + tiles ---
+    left, right = st.columns([2.3, 1], gap="medium")
+    with left:
+        stat_temp = f"{last['temp_c']:.1f} °C" if temp_on else "offline"
+        conf = result["confidence"]
+        src = result["source"] + (f" · confidence {conf:.0%}" if conf is not None else "")
+        html(f"""
+        <div class="ph hero {'bad' if failing else 'ok'}">
+          <div class="hero-row"><span class="hero-label">Printer status</span>
+            <span class="hero-phase">{'● Printing' if printing else '○ Idle'}</span></div>
+          <div class="hero-status">{result['label']}</div>
+          <div class="hero-src">{src}</div>
+          {sparkline(win['vib_rms'].values)}
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="k">Vibration</div><div class="v">{last['vib_rms']:.2f} m/s²</div></div>
+            <div class="hero-stat"><div class="k">Filament speed</div><div class="v">{last['filament_speed_mm_s']:.2f} mm/s</div></div>
+            <div class="hero-stat"><div class="k">Hotend</div><div class="v">{stat_temp}</div></div>
+          </div>
+        </div>""")
+    with right:
+        pct = 100 * (1 - sum(hist.values()) / max(len(hist), 1))
+        m, s = divmod(int(t_now), 60)
+        h, m = divmod(m, 60)
+        elapsed = f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+        n_fail = sum(1 for a in alerts if a["event"] == "FAILING")
+        html(f"""
+        <div class="ph">
+          <div class="tile"><div class="tile-icon {'bad' if failing else ''}">{'!' if failing else '✓'}</div>
+            <div class="tile-body"><div class="tile-k">Time healthy</div><div class="tile-v">{pct:.1f}%</div>
+            <div class="bar"><span style="width:{pct:.1f}%"></span></div></div></div>
+          <div class="tile"><div class="tile-icon">⏱</div>
+            <div class="tile-body"><div class="tile-k">Elapsed</div><div class="tile-v">{elapsed}</div></div></div>
+          <div class="tile"><div class="tile-icon {'bad' if n_fail else ''}">{n_fail}</div>
+            <div class="tile-body"><div class="tile-k">Alerts this session</div>
+            <div class="tile-v">{'None' if not n_fail else (str(n_fail) + (' alert' if n_fail == 1 else ' alerts'))}</div></div></div>
+        </div>""")
+
+    st.write("")
+
+    # --- Row 2: subsystem cards ---
+    subs = result["subsystems"]
+    c1, c2, c3 = st.columns(3, gap="medium")
+    with c1, st.container(key="card_vib"):
+        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Vibration</span>{pill(subs.get('Vibration'))}</div>
+             <div class="sub-val">{last['vib_rms']:.2f}<small>m/s² RMS</small></div>
+             <div class="sub-note">Print head, per axis · dashed line = alert limit</div></div>""")
+        st.altair_chart(chart(win, {"rms_x": "X", "rms_y": "Y", "rms_z": "Z"},
+                              [BLUE_900, BLUE_500, BLUE_300], rule=cfg["vib_limit"]), width="stretch")
+    with c2, st.container(key="card_flow"):
+        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Filament flow</span>{pill(subs.get('Filament flow'))}</div>
+             <div class="sub-val">{last['filament_speed_mm_s']:.2f}<small>mm/s</small></div>
+             <div class="sub-note">{last['filament_total_mm']:.0f} mm fed this print · dips below 0 are retractions</div></div>""")
+        st.altair_chart(chart(win, {"filament_speed_mm_s": "Feed speed"}, [BLUE_700]), width="stretch")
+    with c3, st.container(key="card_temp"):
+        if temp_on:
+            html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Hotend</span>{pill(subs.get('Hotend'))}</div>
+                 <div class="sub-val">{last['temp_c']:.1f}<small>°C</small></div>
+                 <div class="sub-note">Target {cfg['target_temp']:.0f} °C (dashed) · thermocouple</div></div>""")
+            st.altair_chart(chart(win, {"temp_c": "Temperature"}, [BLUE_700], rule=cfg["target_temp"],
+                                  zero=False, area=False,
+                                  domain=[min(cfg["target_temp"] - cfg["temp_band"] - 5, win["temp_c"].min()),
+                                          max(cfg["target_temp"] + cfg["temp_band"] + 5, win["temp_c"].max())]), width="stretch")
+        else:
+            html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Hotend</span>{pill(None)}</div>
+                 <div class="sub-val">off<small></small></div>
+                 <div class="sub-note">Thermocouple</div>
+                 <div class="offline">Thermocouple is switched off in the firmware<br>(MCP9600 replacement pending)</div></div>""")
+
+    st.write("")
+
+    # --- Row 3: alerts ---
+    rows = "".join(
+        f"""<div class="al-row"><div class="al-icon {'bad' if a['event'] == 'FAILING' else 'ok'}">{'!' if a['event'] == 'FAILING' else '✓'}</div>
+        <div class="al-main"><b>{a['subsystem']}</b> {'started failing' if a['event'] == 'FAILING' else 'back to healthy'}
+        <div>at {a['time_s'] // 60}:{a['time_s'] % 60:02d} into the print</div></div>
+        <div class="al-time">{a['clock']}</div></div>""" for a in alerts[:8])
+    with st.container(key="card_alerts"):
+        html(f"""<div class="ph"><div class="al-head"><span class="al-title">Alerts</span>
+             <span class="pill {'bad' if n_fail else 'ok'}">{n_fail} FAILING EVENT{'S' if n_fail != 1 else ''}</span></div>
+             {rows or "<div class='al-empty'>No alerts yet. Everything has stayed healthy.</div>"}</div>""")
+
+
+def header(printing):
+    dot = BLUE_500 if source != "Live CSV" else "#22C55E"
+    html(f"""
+    <div class="ph ph-top">
+      <div><div class="ph-title">Printer Health</div>
+        <div class="ph-sub">Predictive maintenance · UltiMaker S3</div></div>
+      <div class="ph-chip"><span class="dot" style="background:{dot}"></span>{SOURCE_LABEL[source]}</div>
+    </div>""")
+
+
+# history for "Time healthy" starts over when the data source changes
+if st.session_state.get("last_source") != source:
+    st.session_state.last_source = source
+    for k in ("hist", "alerts", "prev_subs"):
+        st.session_state.pop(k, None)
+
+live_view()
