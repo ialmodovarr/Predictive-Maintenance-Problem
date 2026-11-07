@@ -2,13 +2,6 @@
 Live sensor preprocessing + feature engineering for the 3D-printer
 predictive-maintenance capstone.
 
-Input:
-    <project root>/data/sensors/print_YYYYMMDD_HHMMSS.csv
-
-Output:
-    <project root>/data/sensor_post_processed/sensor_features_YYYYMMDD_HHMMSS_microseconds.csv
-    A separate output CSV is created for every script execution.
-
 The script:
 - Selects the newest print_*.csv file by modification time.
 - Detects when a newer timestamped input file appears.
@@ -54,8 +47,8 @@ import pandas as pd
 # from a different current working directory. Keep this script in the
 # Predictive-Maintenance-Problem project root.
 PROJECT_ROOT = Path(__file__).resolve().parent
-SENSOR_DIR = PROJECT_ROOT / "data" / "sensors"
-OUTPUT_DIR = PROJECT_ROOT / "data" / "sensor_post_processed"
+SENSOR_DIR = Path("sensors")  # Absolute input directory requested.
+OUTPUT_DIR =  Path("sensor_preprocessed")
 OUTPUT_FILE: Optional[Path] = None  # Set to a unique file when the script starts.
 
 INPUT_GLOB = "print_*.csv"

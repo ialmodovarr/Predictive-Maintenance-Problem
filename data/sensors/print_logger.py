@@ -74,6 +74,9 @@ class ReplaySource:
 
 class Recording:
     def __init__(self, um_per_turn):
+        self.read_errors = 0
+        self.garbled = 0             # corrupted lines skipped (dropped serial bytes)
+        self.lost = 0                # samples the board reports as lost (gaps in seq)
         self.mm_per_count = um_per_turn / AS5600_COUNTS_PER_TURN / 1000.0
         self.t = array("q")          # microseconds, continuous across board restarts
         self.seq = array("q")        # sample number, continuous across board restarts
@@ -125,14 +128,21 @@ class Recording:
                 tc100 = TEMP_NONE if math.isnan(tf) else int(round(tf * 100))
             except ValueError:
                 return
+            if not (-32768 <= x <= 32767 and -32768 <= y <= 32767 and -32768 <= z <= 32767) \
+                    or (fmt == "us" and t_raw >= 2**32):
+                self.garbled += 1
+                return
             if self.fmt is None:
                 self.fmt = fmt
             if fmt == "us":
                 if self._last_raw_seq is not None:
-                    if seq_raw < self._last_raw_seq:
+                    if seq_raw < self._last_raw_seq and seq_raw < 1000:   # real restart starts near 0
                         self._restart(t_raw)
+                    elif seq_raw <= self._last_raw_seq or seq_raw - self._last_raw_seq > 100_000:
+                        self.garbled += 1                               # corrupted line, skip it
+                        return
                     else:
-                        if t_raw < self._last_raw_t:      # counter wrapped (every ~71 min)
+                        if self._last_raw_t - t_raw > 2**31:            # genuine wrap: ~4.29e9 -> small
                             self._wrap += 1
                         gap = seq_raw - self._last_raw_seq - 1
                         if gap > 0:
@@ -177,16 +187,18 @@ class Recording:
             self.fifo_overflows += 1
             if self.fifo_overflows <= 20:
                 self.notes.append(f"{line} at sample {len(self.t)}")
+        
         elif "zeroed" in line:
             self.zeroed += 1
             self.fil_base = 0            # board counter is now 0, same as the recording's
             self.notes.append(f"filament zeroed (blue button) at sample {len(self.t)}")
             print("board:", line)
+        elif line[:1].isdigit():
+            self.garbled += 1            # glued/partial data line from dropped bytes
         else:
             if len(self.notes) < 200:
                 self.notes.append(line)
             print("board:", line)          # startup messages: I2C scan, IDs, temp check
-
 
 def csv_header():
     u = ACC["suf"]
@@ -195,20 +207,25 @@ def csv_header():
 
 
 def reader(src, rec, writer, f, stop):
-    n = 0
+    buf = b""
+    since_flush = 0
+    bulk = hasattr(src, "in_waiting")                 # real serial port (not --replay)
     while not stop.is_set():
         try:
-            raw = src.readline()
+            chunk = src.read(src.in_waiting or 1) if bulk else src.readline()
         except Exception as e:
             print("Serial error:", e); stop.set(); break
-        line = raw.decode("ascii", "ignore").strip()
-        if not line:
+        if not chunk:
             continue
-        rec.add_line(line, writer)
-        n += 1
-        if n % 200 == 0:
-            f.flush()
-
+        buf += chunk
+        *lines, buf = buf.split(b"\n")
+        for raw in lines:
+            line = raw.decode("ascii", "ignore").strip()
+            if line:
+                rec.add_line(line, writer)
+                since_flush += 1
+        if since_flush >= 200:
+            f.flush(); since_flush = 0
 
 def status_line(rec, last_n, dt):
     """Show the mean and standard deviation of each acceleration axis over the last second."""
@@ -475,7 +492,14 @@ def main():
     else:
         import serial
         port = args.port or find_port()
-        src = serial.Serial(port, args.baud, timeout=0.5); where = port
+        
+        src = serial.Serial(port, args.baud, timeout=0.1); where = port
+        if hasattr(src, "set_buffer_size"):           # Windows only: default is ~4 KB
+            src.set_buffer_size(rx_size=1 << 20)
+        if sys.platform == "win32":                   # don't get starved when unfocused
+            import ctypes
+            k32 = ctypes.windll.kernel32
+            k32.SetPriorityClass(k32.GetCurrentProcess(), 0x80)   # HIGH_PRIORITY_CLASS
     print(f"Reading {where}, saving every sample to {csv_path}")
     print("Press the black RESET button on the Nucleo to see the startup checks. Ctrl+C to stop.\n")
 
