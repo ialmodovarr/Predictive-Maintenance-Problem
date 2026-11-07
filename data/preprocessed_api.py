@@ -43,7 +43,7 @@ PASSWORD = "716b548893f2fe16f0d1929b94857484d291b8af67e61685ba9c1ad24f682e30"
 # ---------------------------------------------------------------------------
 SCRIPT_DIR = Path(__file__).resolve().parent
 INPUT_DIR = SCRIPT_DIR / "api_data"
-OUTPUT_DIR = SCRIPT_DIR / "processed"
+OUTPUT_DIR = SCRIPT_DIR / "api_preprocessed"
 
 # One unique set of output files is created each time this script starts.
 RUN_TIMESTAMP = datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")
