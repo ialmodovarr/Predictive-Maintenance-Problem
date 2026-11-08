@@ -25,7 +25,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-TIMEOUT_S = 2.5
+TIMEOUT_S = (1.5, 3.0)          # (connect, read) seconds
 
 # Same sanity bounds as data/preprocessed_api.py: values outside become NaN.
 LIMITS = {

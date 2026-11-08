@@ -365,6 +365,7 @@ def newest_api_log(path: str) -> str | None:
 
 
 API_SOURCES = ("Printer API", "Live API log", "API log")
+API_RETRY_S = 5                 # seconds to wait before retrying an unreachable printer
 
 
 # ---------------------------------------------------------------------------
@@ -383,7 +384,7 @@ if source == "Printer API":
         st.sidebar.caption("No API credentials found. Reads usually work without them; "
                            "if the printer answers 401, add them to .streamlit/secrets.toml.")
     if st.sidebar.button("Clear history"):
-        for k in ("api_rows", "hist", "alerts", "prev_subs"):
+        for k in ("api_rows", "hist", "alerts", "prev_subs", "api_retry_at"):
             st.session_state.pop(k, None)
 elif source == "Live API log":
     api_log_path = st.sidebar.text_input("Folder data/api.py writes to (or one log file)",
@@ -511,17 +512,25 @@ def get_api_features():
         return df, None
 
     rows = st.session_state.setdefault("api_rows", [])
-    try:
-        row = printer_api.poll_once(api_cfg)
-        row["t_wall"] = time.time()
-        rows.append(row)
-        del rows[:-2000]                          # keep about the last 50 minutes
-        st.session_state.api_error = None
-    except requests.RequestException as e:
-        st.session_state.api_error = str(e)
+    # After a failed poll, wait before trying again. A poll that times out takes longer than
+    # the 1 s refresh, so retrying every refresh would keep the page from ever drawing.
+    retry_at = st.session_state.get("api_retry_at", 0.0)
+    if time.time() >= retry_at:
+        try:
+            row = printer_api.poll_once(api_cfg)
+            row["t_wall"] = time.time()
+            rows.append(row)
+            del rows[:-2000]                      # keep about the last 50 minutes
+            st.session_state.api_error = None
+            st.session_state.api_retry_at = 0.0
+        except requests.RequestException as e:
+            st.session_state.api_error = str(e)
+            st.session_state.api_retry_at = time.time() + API_RETRY_S
     if not rows:
-        return None, (f"Can't reach the printer at {api_cfg['url']}. Is this laptop on the same network "
-                      f"(wahoo) as the printer?\n\n{st.session_state.api_error}")
+        wait = max(0, int(st.session_state.get("api_retry_at", 0) - time.time()))
+        return None, (f"Can't reach the printer at {api_cfg['url']}. Is it turned on, and is this laptop on the "
+                      f"same network (wahoo) as the printer? Trying again in {wait} s. To look at recorded data "
+                      f"instead, pick API log in the sidebar.\n\n{st.session_state.api_error}")
     return printer_api.to_frame(rows), None
 
 
