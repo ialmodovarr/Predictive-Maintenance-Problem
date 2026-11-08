@@ -6,6 +6,9 @@ Data sources, picked in the sidebar:
   Printer API  polls the UltiMaker S3's own HTTP API (nozzle + bed temperature, head
                position, print job) about once a second. Needs the laptop on the same
                network as the printer and the API credentials in .streamlit/secrets.toml.
+  Live API log follows the newest api_data_*.txt that Bella's data/api.py is writing.
+               Run her collector as usual during a print; the dashboard only reads its file,
+               so the printer is polled once, by her script.
   API log      replays a log written by data/api.py (api_data_*.txt), so the API view
                can be demoed without the printer.
   Simulated    fake sensor data generated in the app, with buttons to inject a fault.
@@ -344,16 +347,33 @@ def load_api_log(file_bytes: bytes) -> pd.DataFrame:
     return printer_api.to_frame(printer_api.parse_log_text(file_bytes.decode("utf-8", errors="replace")))
 
 
-API_SOURCES = ("Printer API", "API log")
+@st.cache_data(show_spinner=False, max_entries=4)
+def load_api_log_path(path: str, mtime: float, size: int) -> pd.DataFrame:
+    """Parse a log on disk. mtime/size are only cache keys: the file is re-read when it grows."""
+    with open(path, encoding="utf-8", errors="replace") as f:
+        return printer_api.to_frame(printer_api.parse_log_text(f.read()))
+
+
+def newest_api_log(path: str) -> str | None:
+    """A file path is used as is; a folder means the newest api_data*.txt inside it."""
+    if os.path.isfile(path):
+        return path
+    if os.path.isdir(path):
+        logs = [os.path.join(path, f) for f in os.listdir(path) if f.startswith("api_data") and f.endswith(".txt")]
+        return max(logs, key=os.path.getmtime) if logs else None
+    return None
+
+
+API_SOURCES = ("Printer API", "Live API log", "API log")
 
 
 # ---------------------------------------------------------------------------
 # Sidebar
 # ---------------------------------------------------------------------------
 st.sidebar.title("Printer Health")
-source = st.sidebar.radio("Data source", ["Printer API", "API log", "Simulated", "Replay CSV", "Live CSV"],
-                          captions=["UltiMaker S3, live", "replay a data/api.py log", "sensors, fake data",
-                                    "sensors, recording", "sensors, print_logger.py"])
+source = st.sidebar.radio("Data source", ["Printer API", "Live API log", "API log", "Simulated", "Replay CSV", "Live CSV"],
+                          captions=["dashboard polls the printer", "follows Bella's data/api.py", "replay a data/api.py log",
+                                    "sensors, fake data", "sensors, recording", "sensors, print_logger.py"])
 window_s = st.sidebar.slider("Chart window (seconds)", 30, 600, 120, step=30)
 
 if source == "Printer API":
@@ -365,6 +385,11 @@ if source == "Printer API":
     if st.sidebar.button("Clear history"):
         for k in ("api_rows", "hist", "alerts", "prev_subs"):
             st.session_state.pop(k, None)
+elif source == "Live API log":
+    api_log_path = st.sidebar.text_input("Folder data/api.py writes to (or one log file)",
+                                         placeholder="e.g. ~/Predictive-Maintenance-Problem/data/api_data")
+    st.sidebar.caption("Uses the newest api_data_*.txt in the folder, so starting a new collector run "
+                       "switches the dashboard to it automatically.")
 elif source == "API log":
     api_up = st.sidebar.file_uploader("Log from data/api.py (api_data_*.txt)", type="txt")
     speed_x = st.sidebar.select_slider("Playback speed (samples per refresh)", [1, 2, 5, 10, 30], value=5)
@@ -468,6 +493,23 @@ def get_api_features():
             st.toast("End of log")
         return df.iloc[:pos], None
 
+    if source == "Live API log":
+        folder = os.path.expanduser(api_log_path or "")
+        if not folder:
+            return None, "Enter the folder Bella's data/api.py writes to (its data/api_data folder)."
+        log = newest_api_log(folder)
+        if log is None:
+            return None, f"No api_data_*.txt found at {folder}. Is data/api.py running?"
+        st_ = os.stat(log)
+        df = load_api_log_path(log, st_.st_mtime, st_.st_size)
+        if df.empty:
+            return None, f"Waiting for the first printer snapshot in {os.path.basename(log)}..."
+        if time.time() - st_.st_mtime > 15:
+            st.session_state.api_error = f"{os.path.basename(log)} hasn't changed in {time.time() - st_.st_mtime:.0f} s. Is data/api.py still running?"
+        else:
+            st.session_state.api_error = None
+        return df, None
+
     rows = st.session_state.setdefault("api_rows", [])
     try:
         row = printer_api.poll_once(api_cfg)
@@ -539,7 +581,8 @@ def pill(v) -> str:
 
 
 SOURCE_LABEL = {"Simulated": "Simulated data", "Replay CSV": "Replaying recording", "Live CSV": "Live from sensors",
-                "Printer API": "Live from printer API", "API log": "Replaying API log"}
+                "Printer API": "Live from printer API", "Live API log": "Live from api.py log",
+                "API log": "Replaying API log"}
 
 
 def render_alerts(alerts: list, n_fail: int):
@@ -585,6 +628,8 @@ def api_view():
         return
     if st.session_state.get("api_error") and source == "Printer API":
         st.warning(f"Last poll failed, showing older data: {st.session_state.api_error}")
+    elif st.session_state.get("api_error") and source == "Live API log":
+        st.warning(st.session_state.api_error)
 
     result = api_predict(df, cfg)
     t_now = df["time_s"].iloc[-1]
@@ -760,7 +805,7 @@ def live_view():
 
 
 def header(printing):
-    dot = "#22C55E" if source in ("Live CSV", "Printer API") else BLUE_500
+    dot = "#22C55E" if source in ("Live CSV", "Printer API", "Live API log") else BLUE_500
     html(f"""
     <div class="ph ph-top">
       <div><div class="ph-title">Printer Health</div>
