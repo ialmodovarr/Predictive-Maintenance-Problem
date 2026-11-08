@@ -528,9 +528,9 @@ def get_api_features():
             st.session_state.api_retry_at = time.time() + API_RETRY_S
     if not rows:
         wait = max(0, int(st.session_state.get("api_retry_at", 0) - time.time()))
-        return None, (f"Can't reach the printer at {api_cfg['url']}. Is it turned on, and is this laptop on the "
-                      f"same network (wahoo) as the printer? Trying again in {wait} s. To look at recorded data "
-                      f"instead, pick API log in the sidebar.\n\n{st.session_state.api_error}")
+        return None, (f"Can't reach the printer. Make sure the printer is turned on and you are connected to "
+                      f"eduroam. Trying again in {wait} s. To look at recorded data instead, pick API log in "
+                      f"the sidebar.")
     return printer_api.to_frame(rows), None
 
 
@@ -636,7 +636,7 @@ def api_view():
         st.info(msg or "Waiting for data...")
         return
     if st.session_state.get("api_error") and source == "Printer API":
-        st.warning(f"Last poll failed, showing older data: {st.session_state.api_error}")
+        st.warning("Lost connection to the printer, showing the last data received. Trying again...")
     elif st.session_state.get("api_error") and source == "Live API log":
         st.warning(st.session_state.api_error)
 
