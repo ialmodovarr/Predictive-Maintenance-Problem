@@ -2,7 +2,12 @@
 """
 Printer health dashboard (Streamlit) for the 3D printer predictive maintenance capstone.
 
-Three data sources, picked in the sidebar:
+Data sources, picked in the sidebar:
+  Printer API  polls the UltiMaker S3's own HTTP API (nozzle + bed temperature, head
+               position, print job) about once a second. Needs the laptop on the same
+               network as the printer and the API credentials in .streamlit/secrets.toml.
+  API log      replays a log written by data/api.py (api_data_*.txt), so the API view
+               can be demoed without the printer.
   Simulated    fake sensor data generated in the app, with buttons to inject a fault.
                Works with no printer, no board and no model. Use it to build and demo the UI.
   Replay CSV   plays back a recording made by print_logger.py, sped up if you like.
@@ -14,7 +19,7 @@ Model output is binary: HEALTHY or FAILING. Until the ML model exists, predict()
 uses simple threshold rules as a stand-in. To plug in the real model, replace the body
 of predict() and keep its inputs and outputs the same.
 
-Setup (once):  python3 -m pip install streamlit pandas numpy
+Setup (once):  python3 -m pip install -r requirements.txt
 Run:           python3 -m streamlit run dashboard.py
                (run it from the folder that has the .streamlit/config.toml with the colors;
                without it the app still works, just with Streamlit's default sidebar)
@@ -26,7 +31,10 @@ import time
 import altair as alt
 import numpy as np
 import pandas as pd
+import requests
 import streamlit as st
+
+import printer_api
 
 G = 9.80665
 APPROX_RATE = 800          # samples per second from the board (real rate is about 765)
@@ -296,14 +304,76 @@ def update_alerts(result: dict, t: float):
         prev[name] = bad
 
 
+def api_predict(df: pd.DataFrame, cfg: dict) -> dict:
+    """HEALTHY / FAILING from printer API rows (printer_api.to_frame columns, newest last).
+
+    Same output dict as predict(). Subsystems: Nozzle, Bed, Motion.
+    PLACEHOLDER: threshold rules using the printer's own temperature targets. Swap the body
+    for the real model once it is trained on API features (same column names as
+    data/preprocessed_api.py), and keep the returned dict the same.
+    """
+    n = int(cfg["api_persist_n"])
+    recent = df.tail(n)
+    if len(recent) < n:
+        return {"label": "HEALTHY", "confidence": None,
+                "subsystems": {"Nozzle": None, "Bed": None, "Motion": None}, "source": "warming up"}
+
+    printing = bool(recent["printing"].all())
+
+    def temp_bad(err_col, target_col, band):
+        if recent[err_col].isna().all():
+            return None
+        heated = recent[target_col] > 0          # target 0 = heater off on purpose, not a fault
+        return bool(printing and heated.all() and (recent[err_col].abs() > band).all())
+
+    nozzle = temp_bad("nozzle_error_c", "extruder1_temp_target", cfg["api_nozzle_band"])
+    bed = temp_bad("bed_error_c", "bed_temp_target", cfg["api_bed_band"])
+    speed = recent["head_speed_mm_s"]
+    motion = None if speed.isna().all() else bool(printing and (speed.fillna(0) < cfg["api_stall_speed"]).all())
+    if recent["printer_status"].iloc[-1] == "error":
+        motion = True
+
+    subs = {"Nozzle": nozzle, "Bed": bed, "Motion": motion}
+    failing = any(v for v in subs.values())
+    return {"label": "FAILING" if failing else "HEALTHY", "confidence": None,
+            "subsystems": subs, "source": "placeholder rules on printer API data (ML model not connected)"}
+
+
+@st.cache_data(show_spinner="Reading API log...")
+def load_api_log(file_bytes: bytes) -> pd.DataFrame:
+    return printer_api.to_frame(printer_api.parse_log_text(file_bytes.decode("utf-8", errors="replace")))
+
+
+API_SOURCES = ("Printer API", "API log")
+
+
 # ---------------------------------------------------------------------------
 # Sidebar
 # ---------------------------------------------------------------------------
 st.sidebar.title("Printer Health")
-source = st.sidebar.radio("Data source", ["Simulated", "Replay CSV", "Live CSV"])
+source = st.sidebar.radio("Data source", ["Printer API", "API log", "Simulated", "Replay CSV", "Live CSV"],
+                          captions=["UltiMaker S3, live", "replay a data/api.py log", "sensors, fake data",
+                                    "sensors, recording", "sensors, print_logger.py"])
 window_s = st.sidebar.slider("Chart window (seconds)", 30, 600, 120, step=30)
 
-if source == "Simulated":
+if source == "Printer API":
+    api_cfg = printer_api.get_config(st.secrets if os.path.exists(".streamlit/secrets.toml") else None)
+    api_cfg["url"] = st.sidebar.text_input("Printer address", api_cfg["url"]).rstrip("/")
+    if not api_cfg["user"]:
+        st.sidebar.caption("No API credentials found. Reads usually work without them; "
+                           "if the printer answers 401, add them to .streamlit/secrets.toml.")
+    if st.sidebar.button("Clear history"):
+        for k in ("api_rows", "hist", "alerts", "prev_subs"):
+            st.session_state.pop(k, None)
+elif source == "API log":
+    api_up = st.sidebar.file_uploader("Log from data/api.py (api_data_*.txt)", type="txt")
+    speed_x = st.sidebar.select_slider("Playback speed (samples per refresh)", [1, 2, 5, 10, 30], value=5)
+    if api_up is not None and st.session_state.get("api_replay_name") != api_up.name:
+        st.session_state.api_replay_name = api_up.name
+        st.session_state.api_replay_pos = 0
+        for k in ("hist", "alerts", "prev_subs"):
+            st.session_state.pop(k, None)
+elif source == "Simulated":
     sim = sim_state()
     choice = st.sidebar.selectbox("Inject fault", list(FAULTS), format_func=FAULTS.get,
                                   index=list(FAULTS).index(sim["fault"]))
@@ -331,14 +401,22 @@ else:
                                       placeholder="e.g. ~/sensor_logs/print_20261103_190000.csv")
 
 with st.sidebar.expander("Placeholder rule settings"):
-    cfg = {
-        "vib_limit": st.number_input("Vibration limit (m/s², combined RMS)", value=1.5, step=0.1),
-        "printing_vib": st.number_input("Printing if vibration above (m/s²)", value=0.3, step=0.05),
-        "min_speed": st.number_input("Clog if filament speed below (mm/s)", value=0.2, step=0.05),
-        "target_temp": st.number_input("Nozzle target (°C)", value=210.0, step=5.0),
-        "temp_band": st.number_input("Allowed temp deviation (°C)", value=10.0, step=1.0),
-        "persist_s": st.number_input("Must last this many seconds to count", value=5, min_value=1, step=1),
-    }
+    if source in API_SOURCES:
+        cfg = {
+            "api_nozzle_band": st.number_input("Nozzle: allowed deviation from target (°C)", value=10.0, step=1.0),
+            "api_bed_band": st.number_input("Bed: allowed deviation from target (°C)", value=5.0, step=1.0),
+            "api_stall_speed": st.number_input("Motion: stalled if head slower than (mm/s)", value=0.5, step=0.1),
+            "api_persist_n": st.number_input("Must last this many samples to count", value=8, min_value=1, step=1),
+        }
+    else:
+        cfg = {
+            "vib_limit": st.number_input("Vibration limit (m/s², combined RMS)", value=1.5, step=0.1),
+            "printing_vib": st.number_input("Printing if vibration above (m/s²)", value=0.3, step=0.05),
+            "min_speed": st.number_input("Clog if filament speed below (mm/s)", value=0.2, step=0.05),
+            "target_temp": st.number_input("Nozzle target (°C)", value=210.0, step=5.0),
+            "temp_band": st.number_input("Allowed temp deviation (°C)", value=10.0, step=1.0),
+            "persist_s": st.number_input("Must last this many seconds to count", value=5, min_value=1, step=1),
+        }
     st.caption("These only matter until the ML model replaces predict().")
 
 
@@ -374,6 +452,35 @@ def get_features():
         return None, "Waiting for data..."
     df = summarize(raw)
     return df.iloc[:-1] if len(df) > 1 else df, None   # last second is usually incomplete
+
+
+def get_api_features():
+    """Return (printer API DataFrame up to now, message or None)."""
+    if source == "API log":
+        if api_up is None:
+            return None, "Upload an api_data_*.txt log (written by data/api.py) in the sidebar."
+        df = load_api_log(api_up.getvalue())
+        if df.empty:
+            return None, "No /api/v1/printer snapshots found in that file."
+        pos = min(st.session_state.get("api_replay_pos", 0) + speed_x, len(df))
+        st.session_state.api_replay_pos = pos
+        if pos >= len(df):
+            st.toast("End of log")
+        return df.iloc[:pos], None
+
+    rows = st.session_state.setdefault("api_rows", [])
+    try:
+        row = printer_api.poll_once(api_cfg)
+        row["t_wall"] = time.time()
+        rows.append(row)
+        del rows[:-2000]                          # keep about the last 50 minutes
+        st.session_state.api_error = None
+    except requests.RequestException as e:
+        st.session_state.api_error = str(e)
+    if not rows:
+        return None, (f"Can't reach the printer at {api_cfg['url']}. Is this laptop on the same network "
+                      f"(wahoo) as the printer?\n\n{st.session_state.api_error}")
+    return printer_api.to_frame(rows), None
 
 
 def sparkline(values, w=600, h=70) -> str:
@@ -431,11 +538,133 @@ def pill(v) -> str:
     return "<span class='pill bad'>FAILING</span>" if v else "<span class='pill ok'>HEALTHY</span>"
 
 
-SOURCE_LABEL = {"Simulated": "Simulated data", "Replay CSV": "Replaying recording", "Live CSV": "Live from printer"}
+SOURCE_LABEL = {"Simulated": "Simulated data", "Replay CSV": "Replaying recording", "Live CSV": "Live from sensors",
+                "Printer API": "Live from printer API", "API log": "Replaying API log"}
+
+
+def render_alerts(alerts: list, n_fail: int):
+    rows = "".join(
+        f"""<div class="al-row"><div class="al-icon {'bad' if a['event'] == 'FAILING' else 'ok'}">{'!' if a['event'] == 'FAILING' else '✓'}</div>
+        <div class="al-main"><b>{a['subsystem']}</b> {'started failing' if a['event'] == 'FAILING' else 'back to healthy'}
+        <div>at {a['time_s'] // 60}:{a['time_s'] % 60:02d} into the session</div></div>
+        <div class="al-time">{a['clock']}</div></div>""" for a in alerts[:8])
+    with st.container(key="card_alerts"):
+        html(f"""<div class="ph"><div class="al-head"><span class="al-title">Alerts</span>
+             <span class="pill {'bad' if n_fail else 'ok'}">{n_fail} FAILING EVENT{'S' if n_fail != 1 else ''}</span></div>
+             {rows or "<div class='al-empty'>No alerts yet. Everything has stayed healthy.</div>"}</div>""")
+
+
+def fmt_secs(x) -> str:
+    if x is None or pd.isna(x):
+        return "--"
+    m, s = divmod(int(x), 60)
+    h, m = divmod(m, 60)
+    return f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+
+
+def temp_card(win, last, title, sub, cur, tgt, band, key):
+    """Subsystem card for a heater: current temperature line plus the printer's own target."""
+    with st.container(key=key):
+        target_now = last[tgt]
+        note = f"Target {target_now:.0f} °C (dashed) · from printer API" if target_now > 0 else "Heater off (target 0 °C)"
+        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">{title}</span>{pill(sub)}</div>
+             <div class="sub-val">{last[cur]:.1f}<small>°C</small></div>
+             <div class="sub-note">{note}</div></div>""")
+        vals = pd.concat([win[cur], win[tgt][win[tgt] > 0]]).dropna()
+        lo, hi = (vals.min() - band, vals.max() + band) if len(vals) else (0, 1)
+        d = win[[cur, tgt]].rename(columns={cur: "Current", tgt: "Target"})
+        st.altair_chart(chart(d, {"Current": "Current", "Target": "Target"}, [BLUE_700, "#F87171"],
+                              zero=False, domain=[lo, hi]), width="stretch")
+
+
+def api_view():
+    df, msg = get_api_features()
+    if msg or df is None or df.empty:
+        header(None)
+        st.info(msg or "Waiting for data...")
+        return
+    if st.session_state.get("api_error") and source == "Printer API":
+        st.warning(f"Last poll failed, showing older data: {st.session_state.api_error}")
+
+    result = api_predict(df, cfg)
+    t_now = df["time_s"].iloc[-1]
+    update_alerts(result, t_now)
+    failing = result["label"] == "FAILING"
+    hist = st.session_state.setdefault("hist", {})
+    hist[len(df)] = failing
+    last = df.iloc[-1]
+    win = df[df["time_s"] > t_now - window_s].set_index("time_s")
+    printing = bool(last["printing"])
+    alerts = st.session_state.get("alerts", [])
+    n_fail = sum(1 for a in alerts if a["event"] == "FAILING")
+    subs = result["subsystems"]
+
+    header(printing)
+
+    # --- Row 1: hero status card + tiles ---
+    left, right = st.columns([2.3, 1], gap="medium")
+    with left:
+        conf = result["confidence"]
+        src = result["source"] + (f" · confidence {conf:.0%}" if conf is not None else "")
+        job = last["job_name"] or "No print job"
+        phase = f"● {last['job_state'].replace('_', ' ').capitalize()}" if last["job_state"] else f"○ {last['printer_status'].capitalize() or 'Idle'}"
+        speed = last["head_speed_mm_s"]
+        html(f"""
+        <div class="ph hero {'bad' if failing else 'ok'}">
+          <div class="hero-row"><span class="hero-label">Printer status · {job}</span>
+            <span class="hero-phase">{phase}</span></div>
+          <div class="hero-status">{result['label']}</div>
+          <div class="hero-src">{src}</div>
+          {sparkline(win['nozzle_error_c'].values)}
+          <div class="hero-stats">
+            <div class="hero-stat"><div class="k">Nozzle</div><div class="v">{last['extruder1_temp_current']:.1f} / {last['extruder1_temp_target']:.0f} °C</div></div>
+            <div class="hero-stat"><div class="k">Bed</div><div class="v">{last['bed_temp_current']:.1f} / {last['bed_temp_target']:.0f} °C</div></div>
+            <div class="hero-stat"><div class="k">Head speed</div><div class="v">{'--' if pd.isna(speed) else f'{speed:.1f} mm/s'}</div></div>
+          </div>
+        </div>""")
+    with right:
+        prog = last["job_progress"]
+        prog_pct = 0.0 if pd.isna(prog) else 100 * prog
+        remaining = last["job_time_total"] - last["job_time_elapsed"]
+        pct = 100 * (1 - sum(hist.values()) / max(len(hist), 1))
+        html(f"""
+        <div class="ph">
+          <div class="tile"><div class="tile-icon">{prog_pct:.0f}%</div>
+            <div class="tile-body"><div class="tile-k">Print progress</div><div class="tile-v">{fmt_secs(remaining)} left</div>
+            <div class="bar"><span style="width:{prog_pct:.1f}%"></span></div></div></div>
+          <div class="tile"><div class="tile-icon {'bad' if failing else ''}">{'!' if failing else '✓'}</div>
+            <div class="tile-body"><div class="tile-k">Time healthy</div><div class="tile-v">{pct:.1f}%</div>
+            <div class="bar"><span style="width:{pct:.1f}%"></span></div></div></div>
+          <div class="tile"><div class="tile-icon {'bad' if n_fail else ''}">{n_fail}</div>
+            <div class="tile-body"><div class="tile-k">Alerts this session</div>
+            <div class="tile-v">{'None' if not n_fail else (str(n_fail) + (' alert' if n_fail == 1 else ' alerts'))}</div></div></div>
+        </div>""")
+
+    st.write("")
+
+    # --- Row 2: subsystem cards ---
+    c1, c2, c3 = st.columns(3, gap="medium")
+    with c1:
+        temp_card(win, last, "Nozzle", subs.get("Nozzle"), "extruder1_temp_current", "extruder1_temp_target",
+                  cfg["api_nozzle_band"], "card_api_nozzle")
+    with c2:
+        temp_card(win, last, "Bed", subs.get("Bed"), "bed_temp_current", "bed_temp_target",
+                  cfg["api_bed_band"], "card_api_bed")
+    with c3, st.container(key="card_api_motion"):
+        html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Motion</span>{pill(subs.get('Motion'))}</div>
+             <div class="sub-val">{'--' if pd.isna(speed) else f'{speed:.1f}'}<small>mm/s</small></div>
+             <div class="sub-note">Head at X {last['head_x_mm']:.0f} · Y {last['head_y_mm']:.0f} · Z {last['head_z_mm']:.1f} mm · avg speed between polls</div></div>""")
+        st.altair_chart(chart(win, {"head_speed_mm_s": "Head speed"}, [BLUE_700]), width="stretch")
+
+    st.write("")
+    render_alerts(alerts, n_fail)
 
 
 @st.fragment(run_every=1.0)
 def live_view():
+    if source in API_SOURCES:
+        api_view()
+        return
     df, msg = get_features()
     if msg or df is None or df.empty:
         header(None)
@@ -527,19 +756,11 @@ def live_view():
     st.write("")
 
     # --- Row 3: alerts ---
-    rows = "".join(
-        f"""<div class="al-row"><div class="al-icon {'bad' if a['event'] == 'FAILING' else 'ok'}">{'!' if a['event'] == 'FAILING' else '✓'}</div>
-        <div class="al-main"><b>{a['subsystem']}</b> {'started failing' if a['event'] == 'FAILING' else 'back to healthy'}
-        <div>at {a['time_s'] // 60}:{a['time_s'] % 60:02d} into the print</div></div>
-        <div class="al-time">{a['clock']}</div></div>""" for a in alerts[:8])
-    with st.container(key="card_alerts"):
-        html(f"""<div class="ph"><div class="al-head"><span class="al-title">Alerts</span>
-             <span class="pill {'bad' if n_fail else 'ok'}">{n_fail} FAILING EVENT{'S' if n_fail != 1 else ''}</span></div>
-             {rows or "<div class='al-empty'>No alerts yet. Everything has stayed healthy.</div>"}</div>""")
+    render_alerts(alerts, n_fail)
 
 
 def header(printing):
-    dot = BLUE_500 if source != "Live CSV" else "#22C55E"
+    dot = "#22C55E" if source in ("Live CSV", "Printer API") else BLUE_500
     html(f"""
     <div class="ph ph-top">
       <div><div class="ph-title">Printer Health</div>
@@ -551,7 +772,7 @@ def header(printing):
 # history for "Time healthy" starts over when the data source changes
 if st.session_state.get("last_source") != source:
     st.session_state.last_source = source
-    for k in ("hist", "alerts", "prev_subs"):
+    for k in ("hist", "alerts", "prev_subs", "api_rows"):
         st.session_state.pop(k, None)
 
 live_view()
