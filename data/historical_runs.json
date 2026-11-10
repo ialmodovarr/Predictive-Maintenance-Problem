@@ -1,0 +1,27 @@
+{
+  "timezone": "America/New_York",
+  "label_source": "Operator-confirmed on 2026-11-10: old HEALTHY/FAILED file prefixes in data/api_preprocessed; all FAILED prints were nozzle failures.",
+  "sessions": [
+    {"name": "2026-10-26_11-51_healthy_baseline",
+     "api_file": "HEALTHY_BASELINE_api_data_2026-10-26_11-51-11.txt", "sensor_files": [],
+     "labels": {"nozzle_health": "healthy", "feeder_health": "healthy", "motion_system_health": "healthy"}},
+    {"name": "2026-10-26_12-33_nozzle_failing",
+     "api_file": "api_data_2026-10-26_12-33-06.txt", "sensor_files": [],
+     "labels": {"nozzle_health": "failing", "feeder_health": "healthy", "motion_system_health": "healthy"}},
+    {"name": "2026-10-26_13-00_nozzle_failing",
+     "api_file": "api_data_2026-10-26_13-00-40.txt", "sensor_files": [],
+     "labels": {"nozzle_health": "failing", "feeder_health": "healthy", "motion_system_health": "healthy"}},
+    {"name": "2026-10-26_13-31_nozzle_failing",
+     "api_file": "api_data_2026-10-26_13-31-50.txt", "sensor_files": [],
+     "labels": {"nozzle_health": "failing", "feeder_health": "healthy", "motion_system_health": "healthy"}},
+    {"name": "2026-10-27_11-13_nozzle_failing",
+     "api_file": "api_data_2026-10-27_11-13-40.txt", "sensor_files": [],
+     "labels": {"nozzle_health": "failing", "feeder_health": "healthy", "motion_system_health": "healthy"}},
+    {"name": "2026-10-28_17-50_nozzle_failing",
+     "api_file": "api_data_2026-10-28_17-50-53.txt", "sensor_files": ["print_20261028_175101.csv"],
+     "labels": {"nozzle_health": "failing", "feeder_health": "healthy", "motion_system_health": "healthy"}},
+    {"name": "2026-10-30_14-40_nozzle_failing",
+     "api_file": "api_data_2026-10-30_14-40-55.txt", "sensor_files": ["print_20261030_144152.csv"],
+     "labels": {"nozzle_health": "failing", "feeder_health": "healthy", "motion_system_health": "healthy"}}
+  ]
+}
