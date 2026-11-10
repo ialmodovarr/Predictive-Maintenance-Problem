@@ -1,0 +1,1 @@
+"""Shared timestamp normalization components."""
