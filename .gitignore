@@ -1,2 +1,2 @@
-data/runs/
-data/runs/run_0009/
+__pycache__/
+*.py[cod]

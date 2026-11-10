@@ -1,15 +1,15 @@
 {
-  "session": "2026-10-26_11-51_healthy_baseline",
-  "replayed_at_utc": "2026-11-10T22:20:37.061602Z",
-  "api_file": "data\\api_data\\HEALTHY_BASELINE_api_data_2026-10-26_11-51-11.txt",
+  "session": "2026-10-26_13-00_nozzle_failing",
+  "replayed_at_utc": "2026-11-10T22:20:39.124584Z",
+  "api_file": "data\\api_data\\api_data_2026-10-26_13-00-40.txt",
   "sensor_files": [],
   "timezone_assumed_for_file_names": "America/New_York",
   "label_source": "Operator-confirmed on 2026-11-10: old HEALTHY/FAILED file prefixes in data/api_preprocessed; all FAILED prints were nozzle failures.",
-  "anchor_utc": "2026-10-26T15:51:11.000000Z",
-  "last_record_utc": "2026-10-26T16:14:54.000000Z",
-  "windows": 707,
+  "anchor_utc": "2026-10-26T17:00:40.000000Z",
+  "last_record_utc": "2026-10-26T17:18:01.973684Z",
+  "windows": 516,
   "raw_records": {
-    "api": 1789,
+    "api": 1331,
     "sensor": 0
   },
   "timing": {
@@ -17,8 +17,8 @@
     "sensor": "board clock (mod 2^32) anchored at the logger file-name time; sensor-to-API alignment uncertain by about +/-2 s"
   },
   "stats": {
-    "api_sections": 1790,
-    "api_usable": 1789,
+    "api_sections": 1332,
+    "api_usable": 1331,
     "api_errors_or_truncated": 1,
     "api_stamp_resolution": "HH:MM"
   }

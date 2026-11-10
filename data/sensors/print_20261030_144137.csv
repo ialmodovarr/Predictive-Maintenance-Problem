@@ -1,1 +1,3 @@
-time_s,accel_x_m_s2,accel_y_m_s2,accel_z_m_s2,filament_mm,hotend_temp_C,board_t_us,sample_index,accel_x_counts,accel_y_counts,accel_z_counts,filament_counts
+version https://git-lfs.github.com/spec/v1
+oid sha256:79528bd3c3e80e47dbae569b3d6f43c126b0b893748e4740f727dc9a51f2813e
+size 158

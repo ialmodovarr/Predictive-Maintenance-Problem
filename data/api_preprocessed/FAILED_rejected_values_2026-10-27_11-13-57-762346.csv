@@ -1,9 +1,3 @@
-row_index,laptop_time,metric,rejected_value,allowed_min,allowed_max,reason
-523,11:27,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-524,11:27,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-525,11:27,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-526,11:27,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-523,11:27,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-524,11:27,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-525,11:27,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-526,11:27,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
+version https://git-lfs.github.com/spec/v1
+oid sha256:4131243f24f0390a7997db8943878259447273740bc1bc91de3d59fcba98c50d
+size 692

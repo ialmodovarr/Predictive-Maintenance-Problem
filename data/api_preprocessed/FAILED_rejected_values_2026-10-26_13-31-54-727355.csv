@@ -1,20 +1,3 @@
-row_index,laptop_time,metric,rejected_value,allowed_min,allowed_max,reason
-603,13:47,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-604,13:47,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-605,13:47,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-606,13:47,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-607,13:47,head_x_mm,235.0,0.0,230.0,outside broad engineering sanity bounds
-608,13:47,head_x_mm,-27.8,0.0,230.0,outside broad engineering sanity bounds
-609,13:47,head_x_mm,-27.8,0.0,230.0,outside broad engineering sanity bounds
-610,13:47,head_x_mm,-27.8,0.0,230.0,outside broad engineering sanity bounds
-608,13:47,head_y_mm,195.0,0.0,190.0,outside broad engineering sanity bounds
-609,13:47,head_y_mm,195.0,0.0,190.0,outside broad engineering sanity bounds
-610,13:47,head_y_mm,195.0,0.0,190.0,outside broad engineering sanity bounds
-603,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-604,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-605,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-606,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-607,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-608,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-609,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
-610,13:47,head_z_mm,216.0,0.0,200.0,outside broad engineering sanity bounds
+version https://git-lfs.github.com/spec/v1
+oid sha256:7bf4ec752c0300fc23fb220027cb7e73bf6b5affdcf88fc3b97c5e6e52915378
+size 1539

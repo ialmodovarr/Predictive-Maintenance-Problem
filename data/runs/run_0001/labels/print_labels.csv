@@ -1,2 +1,3 @@
-run_id,nozzle_health,feeder_health,motion_system_health
-run_0001,healthy,healthy,healthy
+version https://git-lfs.github.com/spec/v1
+oid sha256:3544e4883ca7a958d32453f76545ff8669d927893e99371be55f409fed5248f6
+size 91
