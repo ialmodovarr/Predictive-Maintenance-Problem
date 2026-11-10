@@ -8,6 +8,17 @@ from .synchronization.timestamp_sync import utc
 from .windowing.rolling_window import Scheduler
 
 
+def write_window(store, item, config, delay, extra_diagnostics=None):
+    """Extract API and sensor features for one scheduled window and append both rows."""
+    i,start,end,data,stats = item
+    for name,module in (("api",api_features),("sensor",sensor_features)):
+        values,details = module.extract(data[name],config)
+        store.append(name+"_features",{"window_id":f"window_{i:04d}",
+                     "window_start_utc":utc(start),"window_end_utc":utc(end),
+                     **store.labels,**values,"processing_delay_s":delay(end),
+                     "diagnostics":json.dumps({**details,**stats[name],**(extra_diagnostics or {})})})
+
+
 def record(root, labels, config, stop, collectors=None):
     collectors = collectors or {"api":api_collector.collect,"sensor":sensor_collector.collect}
     with Store(root,labels,config) as store:
@@ -37,14 +48,9 @@ def record(root, labels, config, stop, collectors=None):
 
         def drain(now,stopping=False):
             while item := scheduler.take(now,stopping):
-                i,start,end,data,stats = item
-                for name,module in (("api",api_features),("sensor",sensor_features)):
-                    values,details = module.extract(data[name],config)
-                    lag = max(0,time.time()-end)
-                    store.append(name+"_features",{"window_id":f"window_{i:04d}",
-                                 "window_start_utc":utc(start),"window_end_utc":utc(end),
-                                 **store.labels,**values,"processing_delay_s":lag,
-                                 "diagnostics":json.dumps({**details,**stats[name]})})
+                i,end = item[0],item[2]
+                write_window(store,item,config,lambda end:max(0,time.time()-end))
+                lag = max(0,time.time()-end)
                 print(f"{store.path.name} window {i} ended {utc(end)} delay={lag:.3f}s records={counts}",flush=True)
 
         threads = [Thread(target=worker,args=item,name=item[0]) for item in collectors.items()]

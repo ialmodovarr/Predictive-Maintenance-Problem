@@ -22,7 +22,9 @@ are proposed starting settings, not measured hardware specifications.
 - Temperature and acceleration summaries use equal weight per genuine sample.
   Derivative summaries use elapsed-time weights, defined below. This distinction
   is deliberate: different mathematical estimands need different weights.
-- API temperature units: degrees C; head position: mm; acceleration: g; filament
+- API temperature units: degrees C; head position: mm; acceleration: m/s^2
+  (counts / counts_per_g * 9.81, with 9.81 m/s^2 subtracted from X for gravity;
+  raw counts are kept in sensor_raw.csv); filament
   displacement: mm. Conversion calibration must be recorded and hardware-verified.
 - Do not treat every repeated temperature/filament field in a serial packet as a
   proven fresh sensor observation. Preserve packets, but flag unknown update cadence.
@@ -75,16 +77,21 @@ Apply each definition independently to X, Y, and Z, using that axis's valid samp
 
 | Feature suffix | Proposed definition | Units |
 | --- | --- | --- |
-| rms | sqrt(sum(x_i^2)/n), without subtracting the window mean | g |
-| std | Sample SD | g |
-| peak_to_peak | max(x_i)-min(x_i) | g |
+| rms | sqrt(sum(x_i^2)/n), without subtracting the window mean | m/s^2 |
+| std | Sample SD | m/s^2 |
+| peak_to_peak | max(x_i)-min(x_i) | m/s^2 |
 | dominant_frequency | Strongest nonzero one-sided FFT power bin after mean removal and Hann taper | Hz |
 | kurtosis | Bias-corrected Fisher excess kurtosis | dimensionless |
 
-RMS deliberately retains static acceleration/gravity; it measures total axis
-amplitude. A mean-centered RMS would be nearly redundant with axis SD:
-centered_rms = sample_sd * sqrt((n-1)/n). Raw samples remain available if a later
-experiment needs gravity removal. No high-pass filtering is assumed.
+RMS is not mean-centered; it measures total axis amplitude. A mean-centered RMS
+would be nearly redundant with axis SD: centered_rms = sample_sd * sqrt((n-1)/n).
+Gravity is removed only by the fixed 9.81 m/s^2 offset on X (config
+x_gravity_offset_m_s2), applied at collection time, so accel_x_rms reflects X
+dynamics plus any residual static offset (mount tilt, sensor bias). Y and Z keep
+their static components. The offset affects only X RMS; SD, peak-to-peak,
+dominant frequency and kurtosis are offset-invariant. No high-pass filtering is
+assumed. Runs with feature_version < 5 stored and featurized acceleration in g
+(raw key "accel"), with no gravity offset.
 
 For kurtosis, let m2 and m4 be central moments with divisor n and
 g2 = m4/(m2*m2)-3. Return
@@ -194,7 +201,8 @@ partial-duration windows and flag any curtailed late-arrival wait.
 ## Decisions requiring hardware evidence
 
 - Actual firmware, sensor acquisition/update rates, timestamp and sequence semantics.
-- Acceleration counts-to-g calibration, filament distance calibration and direction.
+- Acceleration counts-to-g calibration, the X-axis gravity alignment assumed by
+  the 9.81 m/s^2 offset, filament distance calibration and direction.
 - Measured serial latency/drift and an achievable synchronization uncertainty bound.
 
 These do not prevent synthetic verification of the formulas and scheduler.

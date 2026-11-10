@@ -24,8 +24,10 @@ before running them. No automatic legacy launch compatibility is provided.
 ## Preserved project assets
 
 Existing raw logs, CSVs, Excel workbooks, requirements, model code, and research
-notes remain at their original paths. Historical recordings have not been assigned
-new run IDs, inferred labels, or inferred synchronization. sensortest.ino remains a
+notes remain at their original paths, unmodified. Selected historical recordings
+were replayed into data/runs/ by pipeline/replay/historical.py, using the labels and
+approximate synchronization documented in data/historical_runs.json and each run's
+replay_provenance.json (see the main README). sensortest.ino remains a
 standalone hardware test at the repository root. The existing Random Forest code
 still uses the old labeling and alignment workflow and needs separate adaptation.
 

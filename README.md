@@ -23,6 +23,17 @@ Use `python run_pipeline.py --config settings.json` to override fields from [Con
 
 The seven-field profile defaults to 921600 baud. The archived logger calls these the 200 Hz and 800 Hz firmware profiles. Those names describe expected serial streams. Verify the actual firmware, independent update rates, axis scale, wheel calibration and feed direction on the installed hardware. The default accel_hz is the operator-specified nominal 800 Hz. FFT frequency bins use measured timestamp spacing. The FFT selects the longest continuous segment of at least 5 seconds. Its 95% count threshold is relative to the selected duration, with a 0.00375-second internal gap limit. Time-domain acceleration requires 85% window sample coverage and 9 seconds of timestamp span. API temperature requires at least five observations spanning 7.5 seconds. filament_hz and temp_hz configure maximum acceptable intervals. Repeated filament and temperature fields are reported packet values whose freshness is unverified. The proposed 400 Hz, 10–20 Hz and 3 Hz frequencies require independent measurement. The accelerometer-only test sketch does not establish those rates.
 
+## Replay historical recordings
+
+Recordings made before this pipeline existed (data/api_data, data/sensors) can be converted into runs:
+
+```powershell
+python -m pipeline.replay.historical --dry-run   # list sessions
+python -m pipeline.replay.historical             # write data/runs/run_XXXX
+```
+
+[data/historical_runs.json](data/historical_runs.json) lists each session's API log, overlapping sensor logs and operator-confirmed labels. Records are fed through the same parser, clock mapping, windowing, feature extraction and storage as a live run. Each replayed run also has a replay_provenance.json with its source files and timing method. Timing is approximate: old API logs stamp only HH:MM (snapshots are spread evenly within each minute, ~1 s error). Sensor logs have their board clock repaired (spurious +2^32 µs offsets removed, isolated corrupted rows kept raw but rejected) and are anchored at the logger's file-name time, so sensor-to-API alignment is uncertain by about ±2 s. Re-running skips sessions that already have a run.
+
 ## Operation and verification
 
 [System architecture](PROJECT_ARCHITECTURE.MD) describes concurrent recording, clock mapping, windowing and recovery. [Pipeline specification](DATA_PIPELINE.md) and [feature definitions](FEATURE_DEFINITIONS_PROPOSAL.md) describe outputs and units. Run `python -m unittest discover -s tests -v` for synthetic streams and mock hardware tests. See [the original script map](legacy/README.md) for earlier collection tools.

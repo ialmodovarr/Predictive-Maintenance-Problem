@@ -84,7 +84,7 @@ def extract(records, c):
             sequence_groups.setdefault(r["segment"],set()).add(r["sequence"])
         if "receipt_minus_mapped_s" in r:
             residuals.append(r["receipt_minus_mapped_s"])
-        rows.append((t,{**r, **dict(zip(AXES,r["accel"]))}))
+        rows.append((t,{**r, **dict(zip(AXES,r["accel_m_s2"]))}))
     diag = {"sync_flags":sorted(flags),"segments":len(segments),"freshness":"packet_fields_unverified"}
     diag["sequence_gaps"] = sum(max(s)-min(s)+1-len(s) for s in sequence_groups.values())
     diag["missing_packets_before_records"] = sum(r.get("missing_packets_before",0) for _,r in rows)

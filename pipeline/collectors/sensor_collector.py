@@ -5,6 +5,16 @@ from legacy.data.sensors.print_logger import find_port
 from pipeline.synchronization.timestamp_sync import DeviceClock
 
 
+def to_m_s2(counts, config):
+    """Raw X/Y/Z counts -> m/s^2, with gravity removed from X when configured.
+
+    Raw counts are stored alongside, so the uncorrected values stay recoverable.
+    """
+    scale = config.gravity_m_s2/config.counts_per_g
+    x, y, z = (v*scale for v in counts)
+    return [x - config.x_gravity_offset_m_s2, y, z]
+
+
 def parse(line, clock, received, config):
     parts = line.split(",")
     if len(parts) not in (6, 7):
@@ -24,7 +34,7 @@ def parse(line, clock, received, config):
                    if seq is not None and previous_sequence is not None else 0,
                "sequence": seq, "segment": segment, "sync": sync,
                "counts": [x,y,z], "filament_counts": count,
-               "accel": [v/config.counts_per_g for v in (x,y,z)],
+               "accel_m_s2": to_m_s2((x,y,z), config),
                "displacement": config.feed_direction*count*config.mm_per_turn/4096,
                "temperature": temperature if math.isfinite(temperature) else None}
 

@@ -40,7 +40,7 @@ class PipelineTests(unittest.TestCase):
             t = i/10
             rows.append((t, {"sequence":i,"device_tick":i*100000,
                             "segment":int(i>=46),"sync":"acquisition_gap" if i==46 else "test",
-                            "accel":[0,0,0],"temperature":20+2*t,"displacement":0}))
+                            "accel_m_s2":[0,0,0],"temperature":20+2*t,"displacement":0}))
         out,_ = sensor_features.extract(rows,Config())
         self.assertAlmostEqual(out["thermocouple_temperature_slope"],2)
         for boundary in ("device_reset","forward_clock_discontinuity","receipt_offset_unverified"):
@@ -75,7 +75,7 @@ class PipelineTests(unittest.TestCase):
         times = [0, 1, 3, 4, 5, 6, 7, 8, 9, 9.5]
         positions = [0, 1, 0, 0, 20, 20, 20, 20, 20, 20]
         rows = [(t, {"sequence":i, "device_tick":int(1e6*t), "segment":int(t>=5),
-                     "sync":"test", "accel":[0,0,0], "temperature":20,
+                     "sync":"test", "accel_m_s2":[0,0,0], "temperature":20,
                      "displacement":positions[i]}) for i,t in enumerate(times)]
         config = Config(sensor_gap_s=2)
         out,_ = sensor_features.extract(rows,config)
@@ -129,7 +129,7 @@ class PipelineTests(unittest.TestCase):
             if 40<=i<=46:
                 continue
             rows.append((t,{"sequence":i,"segment":0,"sync":"receipt_offset_unverified",
-                           "device_tick":i*100000,"accel":[1,1,1],
+                           "device_tick":i*100000,"accel_m_s2":[1,1,1],
                            "temperature":20+t,"displacement":0 if i<40 else 100}))
         out,diag = sensor_features.extract(rows,Config(accel_hz=0))
         self.assertEqual(out["filament_velocity_mean"],0)
@@ -159,7 +159,8 @@ class PipelineTests(unittest.TestCase):
         clock = DeviceClock()
         t,r = sensor_collector.parse("100000,1200,256,0,-256,4096,nan",clock,1700000000,c)
         self.assertEqual(t,1700000000)
-        self.assertEqual(r["accel"],[1,0,-1])
+        self.assertEqual(r["accel_m_s2"],[0,0,-9.81])
+        self.assertEqual(r["counts"],[256,0,-256])
         self.assertIsNone(r["temperature"])
         self.assertEqual(r["displacement"],c.mm_per_turn)
         t2,_,_ = clock.map(101250,1201,t+.01,True)
@@ -209,7 +210,7 @@ class PipelineTests(unittest.TestCase):
         for i in range(1000):
             t=i/100
             a=np.sin(2*np.pi*7*t)
-            rows.append((t,{"accel":[a,2*a,3*a],"sequence":i,"device_tick":10000*i,
+            rows.append((t,{"accel_m_s2":[a,2*a,3*a],"sequence":i,"device_tick":10000*i,
                             "sync":"test","segment":0,"temperature":20+2*t,
                             "displacement":-2*t}))
         out,diag = sensor_features.extract(rows,c)
@@ -254,7 +255,7 @@ class PipelineTests(unittest.TestCase):
 
     def test_segment_boundary_preserves_axis_statistics(self):
         rows = [(i, {"sequence":i,"segment":i//5,"sync":"device_reset",
-                    "device_tick":i%5,"accel":[1,1,1],"temperature":22,
+                    "device_tick":i%5,"accel_m_s2":[1,1,1],"temperature":22,
                     "displacement":i%5}) for i in range(10)]
         out,diag = sensor_features.extract(rows,Config(accel_hz=0,accel_count=4,sensor_gap_s=2))
         self.assertEqual(out["accel_x_rms"],1)
@@ -341,7 +342,7 @@ class PipelineTests(unittest.TestCase):
                                       "processing_delay_s","diagnostics"}
             self.assertEqual(set(b[0])-metadata,set(sensor_features.NAMES))
             self.assertEqual(len(set(b[0])-metadata),22)
-            self.assertEqual(json.loads((directory/"settings.json").read_text())["feature_version"],4)
+            self.assertEqual(json.loads((directory/"settings.json").read_text())["feature_version"],5)
             self.assertEqual(b[:len(live)],live)
             self.assertEqual(len(a),len(b))
             self.assertEqual(len({r["window_id"] for r in a}),len(a))

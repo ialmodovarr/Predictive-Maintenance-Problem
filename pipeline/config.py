@@ -15,6 +15,11 @@ class Config:
     port: str = ""
     baud: int = 921600
     counts_per_g: float = 256
+    # Acceleration is stored and featurized in m/s^2: counts/counts_per_g*gravity_m_s2.
+    # x_gravity_offset_m_s2 is then subtracted from X only, the axis aligned with
+    # gravity on the installed mount. Set it to 0 to keep X uncorrected.
+    gravity_m_s2: float = 9.81
+    x_gravity_offset_m_s2: float = 9.81
     mm_per_turn: float = 50.270
     feed_direction: int = 1
     window: float = 10
@@ -58,7 +63,7 @@ class Config:
                     raise ValueError(f.name)
             elif not isinstance(v, (int, float)) or not math.isfinite(v) or v < 0:
                 raise ValueError(f.name)
-            elif v == 0 and f.name not in {"allowance", "accel_hz", "temp_hz", "filament_hz"}:
+            elif v == 0 and f.name not in {"allowance", "accel_hz", "temp_hz", "filament_hz", "x_gravity_offset_m_s2"}:
                 raise ValueError(f.name)
             if f.type is int and type(v) is not int:
                 raise ValueError(f.name)
