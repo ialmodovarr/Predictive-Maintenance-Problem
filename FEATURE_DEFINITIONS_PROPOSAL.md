@@ -95,7 +95,7 @@ This matches the Fisher, bias-corrected convention, not Pearson kurtosis.
 ### Frequency processing
 
 1. Use mapped native acquisition times; subtract the first sample time locally.
-2. Require a trustworthy acquisition cadence and reject reset-crossing sequences.
+2. Require a trustworthy acquisition cadence. Split at clock segments, invalid measurements and gaps exceeding fft_gap_s (default 0.00375 seconds). Select the longest continuous segment, breaking equal-duration ties by earliest start. Require at least 5 seconds. Preserve full-window timestamp-span checks for time-domain statistics.
 3. Estimate sample interval as the median positive consecutive time difference.
    Use sequence/timing diagnostics to flag packet-batching distortion rather than
    treating receipt timestamps as acquisition times.
@@ -151,14 +151,14 @@ may describe reported values, but metadata must not claim verified fresh coverag
 | Setting | Initial proposal |
 | --- | --- |
 | Late-arrival allowance | 0.5 seconds after each window end |
-| API temperature / paired-error support | At least 5 valid observations spanning at least 8 seconds |
+| API temperature / paired-error support | At least 5 valid observations spanning at least 7.5 seconds |
 | API slope support | Same API support plus at least 3 distinct times |
 | API velocity support | At least 4 valid intervals covering at least 7 seconds; no interval longer than 2.5 seconds |
 | Acceleration time-domain support, per axis | At least 32 valid samples, span at least 9 seconds |
-| Acceleration count coverage | At least 90% of expected samples once acquisition rate is verified/configured |
-| FFT support, per axis | At least 256 samples, span at least 9 seconds, count coverage at least 95%; maximum consecutive gap 3 nominal sample intervals |
+| Acceleration count coverage | At least 85% of expected samples once acquisition rate is verified/configured |
+| FFT support, per axis | Longest continuous segment spanning at least 5 seconds, at least 256 samples, 95% count coverage relative to its own duration; maximum internal gap 0.00375 seconds |
 | Periodic filament feature support | At least 4 valid intervals covering at least 8 seconds; maximum gap 3 verified nominal update intervals |
-| Thermocouple support | At least 5 genuine observations spanning at least 8 seconds; maximum gap 3 verified nominal update intervals |
+| Thermocouple support | At least 5 valid observations spanning at least 8 seconds. Slope permits packet-loss gaps up to temp_slope_gap_s (default 1 second), provided the clock mapping remains continuous |
 
 Evaluate criteria using observations valid for the particular feature, including
 paired current/target support for temperature error. Counts alone do not establish
@@ -215,7 +215,11 @@ Forward clock discontinuities invalidate the preceding ambiguous segment in pend
 feature buffers. Native observations remain raw. Acquisition gaps start new segments,
 and filament derivatives never cross those boundaries. When periodic sensor update
 rates are unknown, sensor_gap_s (default 0.25 seconds) limits accepted filament
-intervals and temperature slope support. This is a configurable development
+intervals. Temperature slope uses its separate temp_slope_gap_s limit (default 1 second). This is a configurable development
 threshold, not a sensor-frequency claim. Temperature means and standard deviations
-remain available from reported observations, while slopes across segment boundaries
-or excessive gaps are missing. Other supported features remain available.
+remain available from reported observations, while slopes across resets, reconnects, ambiguous remapping, or gaps exceeding
+temp_slope_gap_s are missing. Acquisition-gap boundaries preserve the clock mapping
+and can be crossed by temperature slopes. The five-observation and eight-second
+support requirements remain in force. Other supported features remain available.
+
+FFT diagnostics retain full-window support statistics and add fft_segment_duration_s (actual duration used, null when unavailable) and fft_candidate_duration_s. Full-window FFT formulas are retained on complete continuous windows.

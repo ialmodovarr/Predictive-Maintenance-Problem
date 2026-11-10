@@ -23,7 +23,7 @@ class Config:
     poll: float = 1
     timeout: float = 2
     api_count: int = 5
-    api_span: float = 8
+    api_span: float = 7.5
     head_intervals: int = 4
     head_span: float = 7
     head_gap: float = 2.5
@@ -31,8 +31,10 @@ class Config:
     accel_span: float = 9
     fft_count: int = 256
     accel_hz: float = 800
-    accel_coverage: float = .90
+    accel_coverage: float = .85
     fft_coverage: float = .95
+    fft_min_span: float = 5
+    fft_gap_s: float = .00375
     gap_periods: float = 3
     filament_hz: float = 0
     filament_intervals: int = 4
@@ -40,6 +42,7 @@ class Config:
     temp_hz: float = 0
     temp_count: int = 5
     temp_span: float = 8
+    temp_slope_gap_s: float = 1
     buffer_limit: int = 100000
     clock_jump_tolerance_s: float = 0.5
     sensor_gap_s: float = 0.25

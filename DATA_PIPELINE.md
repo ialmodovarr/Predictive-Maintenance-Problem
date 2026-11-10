@@ -201,7 +201,7 @@ Filament motion (4 features):
 Thermocouple (3 features):
 - `thermocouple_temperature_mean`
 - `thermocouple_temperature_std`
-- `thermocouple_temperature_slope`
+- `thermocouple_temperature_slope` — fit using actual timestamps with at least five valid observations spanning eight seconds. Permit acquisition gaps up to the configurable temp_slope_gap_s (default 1 second) across a continuous clock mapping. Reject slopes across resets, reconnects, or ambiguous clock remapping.
 
 
 **Feature count:** external sensors = **22** engineered features (15 accelerometer + 4 filament + 3 thermocouple). Together with the six API features, the RF/XGBoost pipeline must output **28 engineered features** per matched, sufficiently populated window: **6 in `api_features.csv`** and **22 in `sensor_features.csv`**. Identifiers, quality metadata, and the three health labels do not count toward the 28 model input features.

@@ -46,7 +46,7 @@ class Store(ExitStack):
                 self.writers[name].writeheader()
                 f.flush()
             self.append("print_labels",self.labels)
-            (self.path/"settings.json").write_text(json.dumps({"feature_version":3,**asdict(config)},indent=2),encoding="utf8")
+            (self.path/"settings.json").write_text(json.dumps({"feature_version":4,**asdict(config)},indent=2),encoding="utf8")
         except BaseException:
             self.close()
             raise

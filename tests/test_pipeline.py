@@ -32,6 +32,45 @@ def read(path):
 
 
 class PipelineTests(unittest.TestCase):
+    def test_temperature_slope_gap_and_clock_boundaries(self):
+        rows = []
+        for i in range(100):
+            if 40<=i<=45:
+                continue
+            t = i/10
+            rows.append((t, {"sequence":i,"device_tick":i*100000,
+                            "segment":int(i>=46),"sync":"acquisition_gap" if i==46 else "test",
+                            "accel":[0,0,0],"temperature":20+2*t,"displacement":0}))
+        out,_ = sensor_features.extract(rows,Config())
+        self.assertAlmostEqual(out["thermocouple_temperature_slope"],2)
+        for boundary in ("device_reset","forward_clock_discontinuity","receipt_offset_unverified"):
+            broken = [(t,{**r,"sync":boundary if r["sequence"]==46 else r["sync"]}) for t,r in rows]
+            out,diag = sensor_features.extract(broken,Config())
+            self.assertTrue(math.isnan(out["thermocouple_temperature_slope"]))
+            self.assertEqual(diag["missing"]["thermocouple_temperature_slope"],"ambiguous_clock_boundary")
+        wide = [(t,r) for t,r in rows if not 3.5<=t<4.6]
+        out,diag = sensor_features.extract(wide,Config())
+        self.assertTrue(math.isnan(out["thermocouple_temperature_slope"]))
+        self.assertEqual(diag["missing"]["thermocouple_temperature_slope"],"temperature_gap_exceeds_slope_limit")
+
+    def test_fft_longest_segment_and_duration(self):
+        times = np.r_[np.arange(2400)/800, 4+np.arange(4800)/800]
+        values = np.sin(2*np.pi*25*times)
+        out = {}
+        stats = sensor_features.acceleration(out,"accel_x_",times,values,Config())
+        self.assertAlmostEqual(out["accel_x_dominant_frequency"],25,delta=.2)
+        self.assertAlmostEqual(stats["fft_segment_duration_s"],4799/800)
+        short = {}
+        stats = sensor_features.acceleration(short,"accel_x_",times[:2400],values[:2400],Config())
+        self.assertIsNone(stats["fft_segment_duration_s"])
+        self.assertNotIn("accel_x_dominant_frequency",short)
+
+    def test_api_count_still_required_at_relaxed_span(self):
+        out,_ = api_features.extract([(t,printer(t)) for t in [0,2,4,6,7.6]],Config())
+        self.assertTrue(math.isfinite(out["api_extruder_temperature_mean"]))
+        out,_ = api_features.extract([(t,printer(t)) for t in [0,2,4,7.6]],Config())
+        self.assertTrue(math.isnan(out["api_extruder_temperature_mean"]))
+
     def test_filament_activity_uses_time_and_breaks_at_segment_boundaries(self):
         times = [0, 1, 3, 4, 5, 6, 7, 8, 9, 9.5]
         positions = [0, 1, 0, 0, 20, 20, 20, 20, 20, 20]
@@ -97,7 +136,7 @@ class PipelineTests(unittest.TestCase):
         self.assertLess(diag["filament_observed_s"],9.2)
         self.assertEqual(out[sensor_features.MOVEMENT_PERCENT],0)
         self.assertAlmostEqual(out[sensor_features.LONGEST_IDLE],5.2)
-        self.assertTrue(math.isnan(out["thermocouple_temperature_slope"]))
+        self.assertAlmostEqual(out["thermocouple_temperature_slope"],1)
         self.assertTrue(math.isfinite(out["thermocouple_temperature_mean"]))
 
     def test_labels(self):
@@ -165,7 +204,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(set(out),set(diag["missing"]))
 
     def test_sensor_features(self):
-        c = Config(accel_hz=100)
+        c = Config(accel_hz=100,fft_gap_s=.03)
         rows = []
         for i in range(1000):
             t=i/100
@@ -302,7 +341,7 @@ class PipelineTests(unittest.TestCase):
                                       "processing_delay_s","diagnostics"}
             self.assertEqual(set(b[0])-metadata,set(sensor_features.NAMES))
             self.assertEqual(len(set(b[0])-metadata),22)
-            self.assertEqual(json.loads((directory/"settings.json").read_text())["feature_version"],3)
+            self.assertEqual(json.loads((directory/"settings.json").read_text())["feature_version"],4)
             self.assertEqual(b[:len(live)],live)
             self.assertEqual(len(a),len(b))
             self.assertEqual(len({r["window_id"] for r in a}),len(a))

@@ -11,23 +11,36 @@ TEMP = "thermocouple_temperature"
 NAMES = tuple(f"accel_{a}_{m}" for a in AXES for m in METRICS) + FEED + (MOVEMENT_PERCENT, LONGEST_IDLE) + tuple(TEMP+"_"+s for s in ("mean","std","slope"))
 
 
-def acceleration(out, prefix, t, x, c):
+def acceleration(out, prefix, t, x, c, fft_groups=None):
+    if fft_groups is None:
+        fft_groups = [(t,x)]
     valid = np.isfinite(x)
     x,t = x[valid],t[valid]
     n = len(t)
     stats = support(t)
     expected = c.accel_hz*c.window
-    if n<max(2,c.accel_count,expected*c.accel_coverage) or stats["span_s"]<c.accel_span:
-        return stats
-    out[prefix+"rms"] = float(np.sqrt(np.mean(x*x)))
-    out[prefix+"std"] = float(np.std(x,ddof=1))
-    out[prefix+"peak_to_peak"] = float(np.ptp(x))
-    centered = x-x.mean()
-    m2 = np.mean(centered**2)
-    if n>=4 and np.ptp(x)>0 and m2>0:
-        g2 = np.mean(centered**4)/m2**2-3
-        out[prefix+"kurtosis"] = float((n-1)*((n+1)*g2+6)/((n-2)*(n-3)))
-    if c.accel_hz and n>=max(c.fft_count,expected*c.fft_coverage) and stats["max_gap_s"]<=c.gap_periods/c.accel_hz and np.ptp(x)>0:
+    if n>=max(2,c.accel_count,expected*c.accel_coverage) and stats["span_s"]>=c.accel_span:
+        out[prefix+"rms"] = float(np.sqrt(np.mean(x*x)))
+        out[prefix+"std"] = float(np.std(x,ddof=1))
+        out[prefix+"peak_to_peak"] = float(np.ptp(x))
+        centered = x-x.mean()
+        m2 = np.mean(centered**2)
+        if n>=4 and np.ptp(x)>0 and m2>0:
+            g2 = np.mean(centered**4)/m2**2-3
+            out[prefix+"kurtosis"] = float((n-1)*((n+1)*g2+6)/((n-2)*(n-3)))
+    candidates = []
+    for times, values in fft_groups:
+        valid_indices = np.flatnonzero(np.isfinite(values))
+        times, values = times[valid_indices], values[valid_indices]
+        cuts = np.flatnonzero((np.diff(times)>c.fft_gap_s) | (np.diff(valid_indices)>1))+1
+        for indices in np.split(np.arange(len(times)),cuts):
+            if len(indices):
+                candidates.append((times[indices],values[indices]))
+    t,x = max(candidates,key=lambda pair:(pair[0][-1]-pair[0][0],-pair[0][0]),default=(np.array([]),np.array([])))
+    duration = float(np.ptp(t)) if len(t) else 0.
+    stats["fft_segment_duration_s"] = None
+    stats["fft_candidate_duration_s"] = duration
+    if c.accel_hz and duration>=c.fft_min_span and len(t)>=max(c.fft_count,duration*c.accel_hz*c.fft_coverage) and np.ptp(x)>0:
         relative = t-t[0]
         step = np.median(np.diff(relative))
         length = int(relative[-1]/step)+1
@@ -36,6 +49,7 @@ def acceleration(out, prefix, t, x, c):
             power = abs(np.fft.rfft((y-y.mean())*np.hanning(length)))**2
             out[prefix+"dominant_frequency"] = float((np.argmax(power[1:])+1)/(step*length))
             stats["fft_resampled"] = True
+            stats["fft_segment_duration_s"] = duration
             stats["estimated_hz"] = float(1/step)
     return stats
 
@@ -78,10 +92,9 @@ def extract(records, c):
     for axis in AXES:
         t,x = series(rows,axis)
         prefix = f"accel_{axis}_"
-        diag[axis] = acceleration(out,prefix,t,x,c)
-        if len(segments)>1:
-            out[prefix+"dominant_frequency"] = math.nan
-            reasons[prefix+"dominant_frequency"] = "device_segment_boundary"
+        fft_groups = [series([(time,row) for time,row in rows if row["segment"]==segment],axis)
+                      for segment in sorted(segments,key=str)] if len(segments)>1 else None
+        diag[axis] = acceleration(out,prefix,t,x,c,fft_groups)
         if not c.accel_hz:
             reasons[prefix+"dominant_frequency"] = "acquisition_rate_unverified"
         elif len(x) and np.ptp(x)==0:
@@ -89,11 +102,22 @@ def extract(records, c):
         if len(x) and np.ptp(x)==0:
             reasons[prefix+"kurtosis"] = "constant_signal"
     t,x = series(rows,"temperature")
-    gap = c.gap_periods/c.temp_hz if c.temp_hz else c.sensor_gap_s
     diag["reported_temperature"] = temperatures(out,TEMP,t,x,c.temp_count,c.temp_span)
-    if len(segments)>1 or (diag["reported_temperature"]["max_gap_s"] or 0)>gap:
+    # Only acquisition-gap boundaries retain the existing device-to-UTC mapping.
+    # Resets, reconnects and other unclassified boundaries remain ambiguous.
+    previous_segment = None
+    ambiguous_clock = False
+    for _, row in sorted(rows,key=lambda item:item[0]):
+        if previous_segment is not None and row["segment"] != previous_segment:
+            if row["sync"] != "acquisition_gap":
+                ambiguous_clock = True
+        previous_segment = row["segment"]
+    if ambiguous_clock:
         out[TEMP+"_slope"] = math.nan
-        reasons[TEMP+"_slope"] = "device_segment_boundary_or_acquisition_gap"
+        reasons[TEMP+"_slope"] = "ambiguous_clock_boundary"
+    elif (diag["reported_temperature"]["max_gap_s"] or 0)>c.temp_slope_gap_s:
+        out[TEMP+"_slope"] = math.nan
+        reasons[TEMP+"_slope"] = "temperature_gap_exceeds_slope_limit"
     t,x = series(rows,"displacement")
     gap = c.gap_periods/c.filament_hz if c.filament_hz else c.sensor_gap_s
     groups = [(t,x)] if len(segments)<=1 else [
