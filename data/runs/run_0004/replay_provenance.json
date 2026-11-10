@@ -1,0 +1,25 @@
+{
+  "session": "2026-10-26_12-33_nozzle_failing",
+  "replayed_at_utc": "2026-11-10T22:20:38.068592Z",
+  "api_file": "data\\api_data\\api_data_2026-10-26_12-33-06.txt",
+  "sensor_files": [],
+  "timezone_assumed_for_file_names": "America/New_York",
+  "label_source": "Operator-confirmed on 2026-11-10: old HEALTHY/FAILED file prefixes in data/api_preprocessed; all FAILED prints were nozzle failures.",
+  "anchor_utc": "2026-10-26T16:33:06.000000Z",
+  "last_record_utc": "2026-10-26T16:54:49.530201Z",
+  "windows": 647,
+  "raw_records": {
+    "api": 1622,
+    "sensor": 0
+  },
+  "timing": {
+    "api": "HH:MM stamps spread evenly within each minute (~1 s error)",
+    "sensor": "board clock (mod 2^32) anchored at the logger file-name time; sensor-to-API alignment uncertain by about +/-2 s"
+  },
+  "stats": {
+    "api_sections": 1622,
+    "api_usable": 1622,
+    "api_errors_or_truncated": 0,
+    "api_stamp_resolution": "HH:MM"
+  }
+}

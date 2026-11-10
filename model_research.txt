@@ -21,7 +21,7 @@ Input Structure:
   - Features: Engineered summary features
     - Accelerometer: RMS, mean, standard deviation, peak, peak-to-peak, dominant frequency, maybe kurtosis
     - Temperature: mean, standard deviation, min, max, range, slope
-    - Filament: average movement rate, movement-rate standard deviation, total movement, filament error, stall fraction
+    - Filament: average movement rate, movement-rate standard deviation, movement fraction (%), longest observed no-movement interval (s)
   - Sampling / Hz:
     - Accelerometer: 400 Hz
       - Sensor supports this

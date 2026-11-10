@@ -10,6 +10,9 @@ Progress:
   * Our SFS won't work with the Ultimaker S3, we're brainstomring alternative ways to measure the rate that the filament comes out at
 
 
+Looking forward:
+
+
 10/12
 Progress:
   - Established repeatable falure

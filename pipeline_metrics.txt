@@ -1,0 +1,24 @@
+EXTRUDER 1 
+- jerk
+- acceleration
+- max speed
+- current/target temperature --> temperature error (current - target), rolling standard deviation
+- material extruded
+- max temperature exposed
+- prints since cleaned
+- time spent hot
+
+
+PRINT HEAD
+- x, y and z position --> Rolling velocity and standard deviation
+- x, y, and z jerk --> Rolling standard deviation
+- x, y and z max speed 
+- acceleration
+
+
+PRINT BED
+- current/target temperature --> Bed temperature error and rolling standard deviation
+
+
+EXTRUDER 2
+N/A

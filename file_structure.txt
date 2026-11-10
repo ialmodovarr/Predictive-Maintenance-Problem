@@ -1,0 +1,43 @@
+FILE STRUCTURE:
+#clean up code structure between API and sensor
+
+ML_MODELS/
+│
+├── data-API/
+│   ├── raw/              # Original, unmodified datasets
+│   ├── processed/        # Cleaned, transformed, feature‑engineered data
+│   └── external/         # API data sources
+│
+│
+├── data-sensor/                  # Core Python code
+│   ├── data/             # Data loading, preprocessing
+│   ├── features/         # Feature engineering
+│   ├── models/           # Model definitions for feature engineering
+│   ├── utils/            # Helper functions, utilities
+│   └── __init__.py
+│
+├── models/               # Saved trained models & checkpoints
+│   ├── random_forest
+│   │  ├── training_models/
+│   │  └── final_model/
+│   ├── xg_boost
+│   │  ├── training_models/
+│   │  └── final_model/
+│   └── 1-D_CNN
+│      ├── training_models/
+│      └── final_model/
+│
+├── results/ # **Classification outputs, metrics, plots, reports**
+│   ├── random_forest
+│   ├── xg_boost
+│   └── 1-D_CNN
+│
+├── configs/              # Hyperparameters, experiment settings
+│
+├── tests/                # Unit/integration tests
+│
+├── docs/                 # README, API docs, data dictionaries
+│
+├── requirements.txt      # Python dependencies
+│
+└── README.md             # Project description, setup instructions
