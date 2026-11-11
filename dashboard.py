@@ -37,6 +37,7 @@ import pandas as pd
 import requests
 import streamlit as st
 
+import notify
 import printer_api
 
 G = 9.80665
@@ -124,6 +125,16 @@ div[class*="st-key-card"] {{
 .pill.na {{ background: #E2E8F0; color: {MUTED}; }}
 .offline {{ height: 190px; display:flex; align-items:center; justify-content:center; text-align:center;
   color: {MUTED}; font-size: .9rem; background: #F5F8FD; border-radius: 14px; margin: 12px 0 14px 0; padding: 0 20px; }}
+
+/* phone alerts banner */
+div[class*="st-key-card_ntfy"] {{ border: 1.5px solid {BLUE_100}; }}
+.nt-title {{ font-weight: 800; color: {INK}; font-size: 1.1rem; }}
+.nt-sub {{ color: {MUTED}; font-size: .9rem; margin: 2px 0 10px 0; }}
+.nt-steps {{ color: {INK}; font-size: .9rem; line-height: 1.7; margin: 0; padding-left: 1.2rem; }}
+.nt-topic {{ font-family: ui-monospace, Menlo, monospace !important; background: {BLUE_100}; color: {BLUE_700};
+  border-radius: 6px; padding: 1px 6px; font-size: .85rem; white-space: nowrap; }}
+.qr {{ width: 140px; height: 140px; background: #FFFFFF; border-radius: 10px; }}
+.qr path {{ fill: {INK}; }}
 
 /* alerts list */
 .al-head {{ display:flex; justify-content:space-between; align-items:center; margin-bottom: 6px; }}
@@ -307,6 +318,45 @@ def update_alerts(result: dict, t: float):
         prev[name] = bad
 
 
+NOTIFY_COOLDOWN_S = 30          # at most one phone alert per 30 s; the latest status is sent after
+REPLAY_SOURCES = {"API log": "Replay", "Replay CSV": "Replay", "Simulated": "Simulated"}
+
+
+def notify_status(result: dict, details: dict, job: str = ""):
+    """Push a phone alert when the overall status flips between HEALTHY and FAILING.
+
+    details maps subsystem name -> one line describing what is wrong with it right now.
+    Sends the current status whenever it differs from the last one sent, at most once per
+    cooldown, so a status that flaps doesn't spam phones and the phone never ends up stale.
+    """
+    if not alerts_on or result.get("source") == "warming up":
+        return
+    label = result["label"]
+    sent = st.session_state.setdefault("ntfy_sent", {"label": "HEALTHY", "t": 0.0, "since": None})
+    if label == sent["label"] or time.time() - sent["t"] < NOTIFY_COOLDOWN_S:
+        return
+
+    stamp = notify.stamp()
+    prefix = f"[{REPLAY_SOURCES[source]}] " if source in REPLAY_SOURCES else ""
+    failing = [k for k, v in result["subsystems"].items() if v]
+    if label == "FAILING":
+        title = f"{prefix}Printer FAILING: {', '.join(failing)}"
+        lines = [details.get(k, f"{k} looks wrong") for k in failing]
+        prio, tags = 5, ["rotating_light"]
+        sent["since"] = time.time()
+    else:
+        title = f"{prefix}Printer back to HEALTHY"
+        mins = (time.time() - sent["since"]) / 60 if sent["since"] else None
+        lines = ["All subsystems look normal again."]
+        if mins is not None:
+            lines.append(f"It was failing for about {max(1, round(mins))} min.")
+        prio, tags = 3, ["white_check_mark"]
+        sent["since"] = None
+    lines.append(stamp + (f" · {job}" if job else ""))
+    notify.send_async(NTFY_SERVER, st.session_state.ntfy_topic, title, "\n".join(lines), ntfy_status, prio, tags)
+    sent.update(label=label, t=time.time())
+
+
 def api_predict(df: pd.DataFrame, cfg: dict) -> dict:
     """HEALTHY / FAILING from printer API rows (printer_api.to_frame columns, newest last).
 
@@ -444,6 +494,27 @@ with st.sidebar.expander("Placeholder rule settings"):
             "persist_s": st.number_input("Must last this many seconds to count", value=5, min_value=1, step=1),
         }
     st.caption("These only matter until the ML model replaces predict().")
+
+_secrets = st.secrets if os.path.exists(".streamlit/secrets.toml") else None
+NTFY_SERVER = notify.server(_secrets)
+if "ntfy_topic" not in st.session_state:
+    st.session_state.ntfy_topic = notify.load_topic(_secrets)
+ntfy_status = st.session_state.setdefault("ntfy_status", {"ok": None, "error": None})
+
+with st.sidebar.expander("Phone alerts"):
+    alerts_on = st.toggle("Send phone alerts", value=True,
+                          help="Push notification to every phone subscribed to the topic when the status "
+                               "changes between HEALTHY and FAILING.")
+    new_topic = st.text_input("ntfy topic", st.session_state.ntfy_topic,
+                              help="Use the same topic on every laptop that runs the dashboard so the "
+                                   "team gets alerts from all of them.")
+    if new_topic.strip() and new_topic.strip() != st.session_state.ntfy_topic:
+        st.session_state.ntfy_topic = new_topic.strip()
+        notify.save_topic(st.session_state.ntfy_topic)
+    if st.button("Show phone setup"):
+        st.session_state.ntfy_banner_hidden = False
+    if ntfy_status["error"]:
+        st.caption(f"Last alert failed to send: {ntfy_status['error'][:120]}")
 
 
 # ---------------------------------------------------------------------------
@@ -655,6 +726,14 @@ def api_view():
     hist = st.session_state.setdefault("hist", {})
     hist[len(df)] = failing
     last = df.iloc[-1]
+    notify_status(result, {
+        "Nozzle": f"Nozzle {last['extruder1_temp_current']:.1f} °C, target {last['extruder1_temp_target']:.0f} °C "
+                  f"({last['nozzle_error_c']:+.1f} °C off)",
+        "Bed": f"Bed {last['bed_temp_current']:.1f} °C, target {last['bed_temp_target']:.0f} °C "
+               f"({last['bed_error_c']:+.1f} °C off)",
+        "Motion": ("Printer reported an error" if last["printer_status"] == "error" else
+                   f"Print head looks stalled ({last['head_speed_mm_s']:.1f} mm/s) while printing"),
+    }, job=last["job_name"])
     win = df[df["time_s"] > t_now - window_s].set_index("time_s")
     printing = bool(last["printing"])
     alerts = st.session_state.get("alerts", [])
@@ -748,6 +827,12 @@ def live_view():
     hist = st.session_state.setdefault("hist", {})
     hist[int(t_now)] = failing
     last = df.iloc[-1]
+    notify_status(result, {
+        "Nozzle": f"Nozzle {last['temp_c']:.1f} °C, target {cfg['target_temp']:.0f} °C "
+                  f"({last['temp_c'] - cfg['target_temp']:+.1f} °C off)",
+        "Feeder": f"Filament not moving ({last['filament_speed_mm_s']:.2f} mm/s) while printing. Possible clog",
+        "Movement system": f"Vibration {last['vib_rms']:.2f} m/s², above the {cfg['vib_limit']:.1f} m/s² limit",
+    })
     win = df[df["time_s"] > t_now - window_s].set_index("time_s")
     printing = last["vib_rms"] > cfg["printing_vib"]
     temp_on = win["temp_c"].notna().any()
@@ -829,6 +914,41 @@ def live_view():
     render_alerts(alerts, n_fail)
 
 
+def phone_banner():
+    """Setup card for phone alerts, under the header until someone hides it."""
+    if st.session_state.get("ntfy_banner_hidden") or not alerts_on:
+        return
+    topic = st.session_state.ntfy_topic
+    with st.container(key="card_ntfy"):
+        qr_col, text_col = st.columns([1, 4], gap="medium", vertical_alignment="center")
+        with qr_col:
+            html(notify.qr_svg(notify.subscribe_url(NTFY_SERVER, topic)))
+        with text_col:
+            html(f"""<div class="ph"><div class="nt-title">Get alerts on your phone</div>
+                 <div class="nt-sub">Step away from the dashboard and still hear about it when the printer
+                 goes from healthy to failing (or back).</div>
+                 <ol class="nt-steps">
+                   <li>Install the free <b>ntfy</b> app (App Store or Google Play).</li>
+                   <li>Scan the QR code with your camera, or in the app tap <b>+</b> and subscribe to
+                       <span class="nt-topic">{topic}</span></li>
+                   <li>Send a test alert to check it works.</li>
+                 </ol></div>""")
+            b1, b2, _ = st.columns([1.5, 0.8, 5], gap="small")
+            if b1.button("Send test alert", type="primary"):
+                try:
+                    notify.send(NTFY_SERVER, topic, "Printer Health test alert",
+                                "Phone alerts are working. You'll get a message like this when the printer "
+                                "status changes.\n" + notify.stamp(),
+                                3, ["bell"])
+                    st.toast("Test alert sent. Check your phone.")
+                except Exception as e:                  # network blocked, ntfy down, etc.
+                    st.toast(f"Couldn't send: {e}")
+            if b2.button("Hide"):
+                st.session_state.ntfy_banner_hidden = True
+                st.rerun()
+    st.write("")
+
+
 def header(printing):
     dot = "#22C55E" if source in ("Live CSV", "Printer API", "Live API log") else BLUE_500
     html(f"""
@@ -837,12 +957,13 @@ def header(printing):
         <div class="ph-sub">Predictive maintenance · UltiMaker S3</div></div>
       <div class="ph-chip"><span class="dot" style="background:{dot}"></span>{SOURCE_LABEL[source]}</div>
     </div>""")
+    phone_banner()
 
 
 # history for "Time healthy" starts over when the data source changes
 if st.session_state.get("last_source") != source:
     st.session_state.last_source = source
-    for k in ("hist", "alerts", "prev_subs", "api_rows"):
+    for k in ("hist", "alerts", "prev_subs", "api_rows", "ntfy_sent"):
         st.session_state.pop(k, None)
 
 live_view()
