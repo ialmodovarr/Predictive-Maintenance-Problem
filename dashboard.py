@@ -534,13 +534,16 @@ def get_api_features():
     return printer_api.to_frame(rows), None
 
 
-def sparkline(values, w=600, h=70) -> str:
+def sparkline(values, w=600, h=70, min_range=None) -> str:
     """Small white trend line for the hero card, as inline SVG."""
     v = np.asarray(values, dtype=float)
     v = v[~np.isnan(v)]
     if len(v) < 2:
         return ""
     lo, hi = v.min(), v.max()
+    if min_range and hi - lo < min_range:          # keep small noise looking small
+        mid = (hi + lo) / 2
+        lo, hi = mid - min_range / 2, mid + min_range / 2
     rng = hi - lo if hi > lo else 1.0
     xs = np.linspace(0, w, len(v))
     ys = h - 6 - (v - lo) / rng * (h - 12)
@@ -624,9 +627,14 @@ def temp_card(win, last, title, sub, cur, tgt, band, key):
              <div class="sub-note">{note}</div></div>""")
         vals = pd.concat([win[cur], win[tgt][win[tgt] > 0]]).dropna()
         lo, hi = (vals.min() - band, vals.max() + band) if len(vals) else (0, 1)
-        d = win[[cur, tgt]].rename(columns={cur: "Current", tgt: "Target"})
-        st.altair_chart(chart(d, {"Current": "Current", "Target": "Target"}, [BLUE_700, "#F87171"],
-                              zero=False, domain=[lo, hi]), width="stretch")
+        if (win[tgt] > 0).any():
+            d = win[[cur, tgt]].rename(columns={cur: "Current", tgt: "Target"})
+            d["Target"] = d["Target"].where(d["Target"] > 0)      # heater off: no target line
+            st.altair_chart(chart(d, {"Current": "Current", "Target": "Target"}, [BLUE_700, "#F87171"],
+                                  zero=False, domain=[lo, hi]), width="stretch")
+        else:
+            st.altair_chart(chart(win, {cur: "Current"}, [BLUE_700], zero=False, area=False,
+                                  domain=[lo, hi]), width="stretch")
 
 
 def api_view():
@@ -669,7 +677,7 @@ def api_view():
             <span class="hero-phase">{phase}</span></div>
           <div class="hero-status">{result['label']}</div>
           <div class="hero-src">{src}</div>
-          {sparkline(win['nozzle_error_c'].values)}
+          {sparkline(win['extruder1_temp_current'].values, min_range=10)}
           <div class="hero-stats">
             <div class="hero-stat"><div class="k">Nozzle</div><div class="v">{last['extruder1_temp_current']:.1f} / {last['extruder1_temp_target']:.0f} °C</div></div>
             <div class="hero-stat"><div class="k">Bed</div><div class="v">{last['bed_temp_current']:.1f} / {last['bed_temp_target']:.0f} °C</div></div>
@@ -704,11 +712,19 @@ def api_view():
     with c2:
         temp_card(win, last, "Bed", subs.get("Bed"), "bed_temp_current", "bed_temp_target",
                   cfg["api_bed_band"], "card_api_bed")
+    if last[["head_x_mm", "head_y_mm", "head_z_mm"]].isna().any():
+        head_pos = "Head position not reported (printer idle)"
+    else:
+        head_pos = (f"Head at X {last['head_x_mm']:.0f} · Y {last['head_y_mm']:.0f} · "
+                    f"Z {last['head_z_mm']:.1f} mm · avg speed between polls")
     with c3, st.container(key="card_api_motion"):
         html(f"""<div class="ph"><div class="sub-head"><span class="sub-title">Motion</span>{pill(subs.get('Motion'))}</div>
              <div class="sub-val">{'--' if pd.isna(speed) else f'{speed:.1f}'}<small>mm/s</small></div>
-             <div class="sub-note">Head at X {last['head_x_mm']:.0f} · Y {last['head_y_mm']:.0f} · Z {last['head_z_mm']:.1f} mm · avg speed between polls</div></div>""")
-        st.altair_chart(chart(win, {"head_speed_mm_s": "Head speed"}, [BLUE_700]), width="stretch")
+             <div class="sub-note">{head_pos}</div></div>""")
+        if win["head_speed_mm_s"].notna().any():
+            st.altair_chart(chart(win, {"head_speed_mm_s": "Head speed"}, [BLUE_700]), width="stretch")
+        else:
+            st.caption("Head speed shows up once the print head starts moving.")
 
     st.write("")
     render_alerts(alerts, n_fail)

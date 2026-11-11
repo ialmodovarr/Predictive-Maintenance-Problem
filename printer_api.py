@@ -51,7 +51,7 @@ def get_config(secrets_obj=None) -> dict:
             return secrets_obj[name] if secrets_obj is not None and name in secrets_obj else ""
         except Exception:                      # no secrets.toml at all
             return ""
-    return {"url": (pick("PRINTER_URL") or "http://172.27.135.1").rstrip("/"),
+    return {"url": (pick("PRINTER_URL") or "http://172.27.189.79").rstrip("/"),
             "user": pick("PRINTER_USER"), "password": pick("PRINTER_PASS")}
 
 
