@@ -308,7 +308,7 @@ def main() -> None:
     p.add_argument("--runs", nargs="+", help="run folder names (default: all newest-version runs)")
     p.add_argument("--features", choices=("api", "sensor", "all"), default="all")
     p.add_argument("--exclude", nargs="+", default=[], help="feature names to drop (ablation)")
-    p.add_argument("--trees", type=int, default=400)
+    p.add_argument("--trees", type=int, default=100)
     p.add_argument("--min-leaf", type=int, default=5)
     p.add_argument("--threshold", type=float, default=0.5)
     p.set_defaults(func=train)

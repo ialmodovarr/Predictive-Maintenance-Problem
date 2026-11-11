@@ -33,7 +33,7 @@
   "feature_group": "all",
   "excluded": [],
   "threshold": 0.5,
-  "trees": 400,
+  "trees": 100,
   "min_leaf": 5,
   "runs": [
     "run_0001",
