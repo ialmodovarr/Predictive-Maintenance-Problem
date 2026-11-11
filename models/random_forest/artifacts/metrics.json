@@ -1,0 +1,154 @@
+{
+  "created_utc": "2026-11-10T23:57:41.500938+00:00",
+  "features": [
+    "api_extruder_temperature_mean",
+    "api_extruder_temperature_std",
+    "api_extruder_temperature_slope",
+    "api_extruder_temperature_error",
+    "api_head_velocity_mean",
+    "api_head_velocity_std",
+    "accel_x_rms",
+    "accel_x_std",
+    "accel_x_peak_to_peak",
+    "accel_x_dominant_frequency",
+    "accel_x_kurtosis",
+    "accel_y_rms",
+    "accel_y_std",
+    "accel_y_peak_to_peak",
+    "accel_y_dominant_frequency",
+    "accel_y_kurtosis",
+    "accel_z_rms",
+    "accel_z_std",
+    "accel_z_peak_to_peak",
+    "accel_z_dominant_frequency",
+    "accel_z_kurtosis",
+    "filament_velocity_mean",
+    "filament_movement_rate_std",
+    "filament_movement_fraction_pct",
+    "filament_longest_no_movement_interval_s",
+    "thermocouple_temperature_mean",
+    "thermocouple_temperature_std",
+    "thermocouple_temperature_slope"
+  ],
+  "feature_group": "all",
+  "excluded": [],
+  "threshold": 0.5,
+  "trees": 400,
+  "min_leaf": 5,
+  "runs": [
+    "run_0001",
+    "run_0002",
+    "run_0003",
+    "run_0004",
+    "run_0005",
+    "run_0006",
+    "run_0007",
+    "run_0009"
+  ],
+  "targets": {
+    "nozzle_health": {
+      "trained": true,
+      "runs_per_class": {
+        "failing": 6,
+        "healthy": 2
+      },
+      "leakage_warnings": [],
+      "evaluation": {
+        "evaluated_runs": [
+          "run_0001",
+          "run_0002",
+          "run_0003",
+          "run_0004",
+          "run_0005",
+          "run_0006",
+          "run_0007",
+          "run_0009"
+        ],
+        "skipped_runs": [],
+        "windows": 3979,
+        "classes_in_evaluation": [
+          0,
+          1
+        ],
+        "precision": 0.7205576980124592,
+        "recall": 0.7998024366150807,
+        "f1": 0.7581148564294632,
+        "balanced_accuracy": 0.39990121830754033,
+        "confusion_matrix": [
+          [
+            0,
+            942
+          ],
+          [
+            608,
+            2429
+          ]
+        ],
+        "per_run": [
+          {
+            "run_id": "run_0001",
+            "true": 0,
+            "fraction_predicted_failing": 1.0,
+            "mean_failing_score": 1.0
+          },
+          {
+            "run_id": "run_0002",
+            "true": 1,
+            "fraction_predicted_failing": 0.5517774343122102,
+            "mean_failing_score": 0.5394184357946413
+          },
+          {
+            "run_id": "run_0003",
+            "true": 1,
+            "fraction_predicted_failing": 0.7344961240310077,
+            "mean_failing_score": 0.6200744739194698
+          },
+          {
+            "run_id": "run_0004",
+            "true": 1,
+            "fraction_predicted_failing": 0.8229166666666666,
+            "mean_failing_score": 0.6661562745650839
+          },
+          {
+            "run_id": "run_0005",
+            "true": 1,
+            "fraction_predicted_failing": 0.8788598574821853,
+            "mean_failing_score": 0.7001057872204354
+          },
+          {
+            "run_id": "run_0006",
+            "true": 1,
+            "fraction_predicted_failing": 0.9143426294820717,
+            "mean_failing_score": 0.7329071832032747
+          },
+          {
+            "run_id": "run_0007",
+            "true": 0,
+            "fraction_predicted_failing": 1.0,
+            "mean_failing_score": 0.9681872271752971
+          },
+          {
+            "run_id": "run_0009",
+            "true": 1,
+            "fraction_predicted_failing": 0.9957537154989384,
+            "mean_failing_score": 0.7770774118983561
+          }
+        ]
+      }
+    },
+    "feeder_health": {
+      "trained": false,
+      "reason": "single class",
+      "runs_per_class": {
+        "healthy": 8
+      }
+    },
+    "motion_system_health": {
+      "trained": false,
+      "reason": "single class",
+      "runs_per_class": {
+        "healthy": 8
+      }
+    }
+  }
+}

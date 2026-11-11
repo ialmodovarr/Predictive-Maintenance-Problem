@@ -1,0 +1,170 @@
+{
+  "created_utc": "2026-11-10T23:59:49.886769+00:00",
+  "model": "xgboost",
+  "features": [
+    "api_extruder_temperature_mean",
+    "api_extruder_temperature_std",
+    "api_extruder_temperature_slope",
+    "api_extruder_temperature_error",
+    "api_head_velocity_mean",
+    "api_head_velocity_std",
+    "accel_x_rms",
+    "accel_x_std",
+    "accel_x_peak_to_peak",
+    "accel_x_dominant_frequency",
+    "accel_x_kurtosis",
+    "accel_y_rms",
+    "accel_y_std",
+    "accel_y_peak_to_peak",
+    "accel_y_dominant_frequency",
+    "accel_y_kurtosis",
+    "accel_z_rms",
+    "accel_z_std",
+    "accel_z_peak_to_peak",
+    "accel_z_dominant_frequency",
+    "accel_z_kurtosis",
+    "filament_velocity_mean",
+    "filament_movement_rate_std",
+    "filament_movement_fraction_pct",
+    "filament_longest_no_movement_interval_s",
+    "thermocouple_temperature_mean",
+    "thermocouple_temperature_std",
+    "thermocouple_temperature_slope"
+  ],
+  "feature_group": "all",
+  "excluded": [],
+  "threshold": 0.5,
+  "trees": 300,
+  "max_depth": 3,
+  "learning_rate": 0.05,
+  "min_child_weight": 5.0,
+  "seed": 42,
+  "runs": [
+    "run_0001",
+    "run_0002",
+    "run_0003",
+    "run_0004",
+    "run_0005",
+    "run_0006",
+    "run_0007",
+    "run_0009"
+  ],
+  "targets": {
+    "nozzle_health": {
+      "trained": true,
+      "runs_per_class": {
+        "failing": 6,
+        "healthy": 2
+      },
+      "coverage": {
+        "api": {
+          "healthy": 0.9989384288747346,
+          "failing": 0.9993414553836022
+        },
+        "sensor": {
+          "healthy": 0.2494692144373673,
+          "failing": 0.06190319394138953
+        }
+      },
+      "leakage_warnings": [
+        "sensor feature coverage differs by class (healthy 25%, failing 6% of windows); the model may separate classes by data availability."
+      ],
+      "evaluation": {
+        "evaluated_runs": [
+          "run_0001",
+          "run_0002",
+          "run_0003",
+          "run_0004",
+          "run_0005",
+          "run_0006",
+          "run_0007",
+          "run_0009"
+        ],
+        "skipped_runs": [],
+        "windows": 3979,
+        "classes_in_evaluation": [
+          0,
+          1
+        ],
+        "precision": 0.7034938621340887,
+        "recall": 0.7359236088244978,
+        "f1": 0.7193434180881879,
+        "balanced_accuracy": 0.3679618044122489,
+        "confusion_matrix": [
+          [
+            0,
+            942
+          ],
+          [
+            802,
+            2235
+          ]
+        ],
+        "per_run": [
+          {
+            "run_id": "run_0001",
+            "true": 0,
+            "fraction_predicted_failing": 1.0,
+            "mean_failing_score": 0.9964174032211304
+          },
+          {
+            "run_id": "run_0002",
+            "true": 1,
+            "fraction_predicted_failing": 0.46213292117465227,
+            "mean_failing_score": 0.4918241798877716
+          },
+          {
+            "run_id": "run_0003",
+            "true": 1,
+            "fraction_predicted_failing": 0.6569767441860465,
+            "mean_failing_score": 0.6271839737892151
+          },
+          {
+            "run_id": "run_0004",
+            "true": 1,
+            "fraction_predicted_failing": 0.7375,
+            "mean_failing_score": 0.6841985583305359
+          },
+          {
+            "run_id": "run_0005",
+            "true": 1,
+            "fraction_predicted_failing": 0.8099762470308789,
+            "mean_failing_score": 0.735659122467041
+          },
+          {
+            "run_id": "run_0006",
+            "true": 1,
+            "fraction_predicted_failing": 0.8625498007968128,
+            "mean_failing_score": 0.7865010499954224
+          },
+          {
+            "run_id": "run_0007",
+            "true": 0,
+            "fraction_predicted_failing": 1.0,
+            "mean_failing_score": 0.8719765543937683
+          },
+          {
+            "run_id": "run_0009",
+            "true": 1,
+            "fraction_predicted_failing": 0.9957537154989384,
+            "mean_failing_score": 0.9269429445266724
+          }
+        ]
+      }
+    },
+    "feeder_health": {
+      "trained": false,
+      "reason": "single class",
+      "runs_per_class": {
+        "healthy": 8
+      }
+    },
+    "motion_system_health": {
+      "trained": false,
+      "reason": "single class",
+      "runs_per_class": {
+        "healthy": 8
+      }
+    }
+  }
+}
