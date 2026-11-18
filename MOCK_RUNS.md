@@ -43,6 +43,112 @@ Generate a fresh dataset with `python -m pipeline.mock_build`. For selected miss
 
 Each data/mock_runs/run_NNNN directory contains raw/api_raw.csv, raw/sensor_raw.csv, features/api_features.csv, features/sensor_features.csv, labels/print_labels.csv and settings.json. Select explicitly using the shared model loader `load_run(Path("data/mock_runs/run_0008"))`. Model CLIs default to data/runs. Use data/mock_metadata/split.json to select whole runs for development and held-out workflow testing.
 
+## How to generate the mock dataset
+
+### 1. Open PowerShell in the project folder
+
+Run all commands below from the repository root.
+
+### 2. Set up Python
+
+Use Python 3.11 or newer.
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+```
+
+The recorded reference environment used Python 3.12.5 and NumPy 2.4.3. Matching those versions is recommended when checking exact reproduction.
+
+### 3. Prepare the input and output folders
+
+Before starting:
+
+- Keep the original recordings in `data/runs/`. The generator reads these to create hybrid runs.
+- Keep `data/mock_metadata/config.json` and `data/mock_metadata/reference.json`.
+- Allow at least 16 GB of free space, preferably more for temporary files.
+- If rebuilding an existing dataset, move `data/mock_runs/` and a backup of `data/mock_metadata/` outside the output folders. Then recreate `data/mock_runs/` and restore `config.json` and `reference.json` into `data/mock_metadata/`.
+
+Do not delete or overwrite the original recordings in `data/runs/`.
+
+### 4. Generate all 30 runs
+
+```powershell
+.\.venv\Scripts\python.exe -m pipeline.mock_build
+```
+
+This command:
+
+1. Generates pilot runs 0008 and 0022.
+2. Checks pilot feature completeness and available disk space.
+3. Rebuilds run 0008 in a temporary folder and compares file hashes.
+4. Generates the remaining runs.
+5. Audits the complete dataset and writes the reports.
+
+Generation can take a substantial amount of time. The recorded build used about 2.49 combined worker-hours; elapsed time depends on the computer.
+
+### 5. Check the output
+
+Each run appears under `data/mock_runs/run_NNNN/` and contains:
+
+```text
+raw/api_raw.csv
+raw/sensor_raw.csv
+features/api_features.csv
+features/sensor_features.csv
+labels/print_labels.csv
+settings.json
+```
+
+The build also writes metadata, including:
+
+- `data/mock_metadata/pilots.json`
+- `data/mock_metadata/validation.json`
+- `data/mock_metadata/split.json`
+- Per-run metadata files
+
+A successful reference build produced 30 runs covering approximately 9.65 hours and occupying 14.50 GB. Exact reproduction requires matching the original inputs, configuration, code, and environment.
+
+### If the build is interrupted
+
+If the pilot checks finished successfully and `pilots.json` records `"reproduced": 8`, resume with:
+
+```powershell
+.\.venv\Scripts\python.exe -m pipeline.mock_build --resume
+```
+
+This generates missing run directories and then audits the dataset. It does not repair existing incomplete run directories.
+
+If the pilot checks did not finish, move the partial outputs aside and restart the full build.
+
+### Generate selected missing runs
+
+For example, to generate runs 0008 and 0022:
+
+```powershell
+.\.venv\Scripts\python.exe -m pipeline.mock_dataset 8 22
+```
+
+Runs with both an existing output directory and metadata file are skipped. This command does not perform the full pilot verification or final report generation.
+
+### Audit an existing complete dataset
+
+```powershell
+.\.venv\Scripts\python.exe -m pipeline.mock_audit
+```
+
+The full audit requires all 30 runs and `pilots.json`. It regenerates `validation.json`, `split.json`, and `MOCK_RUNS.md`.
+
+**Documentation note:** Both the full build and full audit overwrite `MOCK_RUNS.md`. Instructions added manually to this file will be replaced.
+
+### Use the correct dataset for model development
+
+Explicitly select `data/mock_runs/`; model command-line tools default to `data/runs/`.
+
+Use `data/mock_metadata/split.json` to keep whole runs together when separating development and test data.
+
+Mock results demonstrate workflow behavior under simulated assumptions. They do not establish real-world fault-detection accuracy. All feeder and motion labels are healthy.
+
 ## Generation and supplementation
 
 Each synthetic run shares its head-motion and thermal trajectory across API, vibration, filament and lagged thermocouple measurements. Normal pauses and intermittent retractions occur in both conditions. Run-specific oscillations, quantized counts, timing jitter and held sensor values generate raw STM32 packets. The measured historical packet period is approximately 1303 microseconds. Nominal feature thresholds remain at 800 Hz. The generator targets 767 Hz, with provisional encoder and temperature updates at 10 Hz and 3 Hz. Synthetic thermal fluctuations and intermittent feed reductions vary with provisional nozzle severity. The target temperature distribution is shared across classes. Historical interventions that changed temperature targets remain in real records.
