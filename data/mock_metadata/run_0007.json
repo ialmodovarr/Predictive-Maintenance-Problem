@@ -1,0 +1,24 @@
+{
+  "run": "run_0007",
+  "origin": "hybrid",
+  "labels": {
+    "nozzle_health": "healthy",
+    "feeder_health": "healthy",
+    "motion_system_health": "healthy"
+  },
+  "duration": 1200,
+  "split": "test",
+  "raw": {
+    "api": 2388,
+    "sensor": 919362
+  },
+  "windows": 596,
+  "synthetic_sensor_intervals": [
+    [
+      "2026-11-10T23:10:21.621483Z",
+      "2026-11-10T23:22:22.678864Z"
+    ]
+  ],
+  "original_api_records": 948,
+  "seconds": 376.178499200003
+}

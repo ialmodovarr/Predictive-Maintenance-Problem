@@ -1,0 +1,28 @@
+{
+  "run": "run_0006",
+  "origin": "hybrid",
+  "labels": {
+    "nozzle_health": "failing",
+    "feeder_health": "healthy",
+    "motion_system_health": "healthy"
+  },
+  "duration": 1085.3892619609833,
+  "split": "train_validation",
+  "raw": {
+    "api": 1260,
+    "sensor": 818364
+  },
+  "windows": 538,
+  "synthetic_sensor_intervals": [
+    [
+      "2026-10-28T21:50:53.000000Z",
+      "2026-10-28T21:51:00.998000Z"
+    ],
+    [
+      "2026-10-28T21:53:06.026796Z",
+      "2026-10-28T22:08:58.389262Z"
+    ]
+  ],
+  "original_api_records": 1260,
+  "seconds": 323.743667799994
+}

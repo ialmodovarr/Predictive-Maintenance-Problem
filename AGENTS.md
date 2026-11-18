@@ -149,3 +149,7 @@ After completing a coding task, summarize:
 4. Any remaining issues or recommended next steps.
 
 Keep summaries proportional to the complexity of the task.
+
+### Mock recordings
+
+Refer to [MOCK_RUNS.md](MOCK_RUNS.md) for mock dataset structure, generation, assignments and limitations. Preserve original experimental recordings in `data/runs/`. Select `data/mock_runs/` explicitly for model development with synthetic and supplemented recordings. Never overwrite originals or unintentionally mix the two datasets. Mock evaluation metrics cannot establish real-world fault-detection performance.
