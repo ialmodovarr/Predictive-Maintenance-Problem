@@ -6,7 +6,7 @@ This document specifies the **live data collection and feature-engineering pipel
 
 **Current implementation scope:** collect and preserve API and STM32 sensor measurements; synchronize the streams; compute rolling-window, tabular features; and continuously write **two separate feature CSVs** suitable for RF/XGBoost model preparation.
 
-**Future scope, not to implement now:** a 1D-CNN may use raw accelerometer time sequences directly, and may use raw or engineered signals from other sources. Its exact input preparation, resampling, and fusion architecture will be specified separately. **Do not assume CNN inputs must pass through the RF/XGBoost feature engineering pipeline.**
+**Downstream CNN scope:** the hybrid CNN consumes raw XYZ acceleration and 13 saved auxiliary features. See the hybrid-fusion section below and ML_MODELS.md; the live pipeline remains unchanged.
 
 **Modularity is a requirement, not an optional enhancement.** Raw collection, timestamp normalization, time-window selection, feature extraction, storage, and model-specific input preparation must be separate reusable components. The future CNN must be able to reuse the raw measurements and shared timing infrastructure without rewriting the collectors or being constrained to tabular features.
 
@@ -344,3 +344,42 @@ with counts retained in diagnostics. Raw observations remain available. Filament
 velocity never bridges segmented gaps. Unknown-rate timing limits default to the
 configurable sensor_gap_s value. See PROJECT_ARCHITECTURE.MD for the fixed-offset
 UTC mapping and its remaining latency/drift uncertainty.
+
+## Hybrid-fusion 1D-CNN data pipeline
+
+The downstream CLI is `python models/cnn_1d/cnn_1d.py`. `run_pipeline.py` remains
+responsible for live raw collection and feature generation. The CNN does not run
+inside the collector. Explicit --dataset mock selects data/mock_runs; --dataset
+real selects data/runs. Never merge these roots implicitly.
+
+1. Read authoritative print labels and matching API/sensor feature rows. Join by
+   run/window ID and verify identical UTC boundaries and labels. Require existing
+   ten-second half-open windows at two-second strides and verified feature version 5.
+2. Stream raw sensor CSV and decode record_json. Use mapped timestamp_utc, retain
+   segment meaning, exclude malformed/out-of-order data, and reject ambiguous
+   duplicate values and invalidated timing segments. Raw files remain unchanged.
+3. Require finite XYZ, at least ceil(0.99 * 10 * rate) in-window observations,
+   a 9.99-second span, no segment crossing and gaps at most 2.5 ms. The provisional
+   rate is 767 Hz: 7,594 minimum observations and 7,670 target positions.
+4. Linearly interpolate at start+n/rate. Adjacent outside-window observations may
+   bracket points only within the same run/segment and maximum gap. They do not
+   contribute to in-window count/span. Reject unsupported points; never extrapolate,
+   zero-fill or compress time. Future live inference must wait for necessary
+   brackets and account for transport latency.
+5. Select the exact 13 auxiliary columns documented in ML_MODELS.md. Reject missing
+   or nonfinite required values; do not impute. Unused acceleration statistics do
+   not determine eligibility. Preserve signed filament velocity and percentage units.
+6. Write deterministic unnormalized arrays under data/cnn_cache/<dataset>/<hash>/
+   run_NNNN. Manifest hashes cover source files and preprocessing settings/version.
+   windows.csv maps populated array rows to identities and labels; eligibility.csv
+   records rejected windows and reasons. Reuse compatible caches across folds.
+7. Split only by print run. Fit equal-run normalization moments on eligible training
+   windows, separately for XYZ and each auxiliary column. Validation/test/prediction
+   use saved training statistics. Cached arrays never contain globally fitted scales.
+8. Feed `(B,3,7670)` acceleration and `(B,13)` auxiliary tensors to the network.
+   Save preprocessing, splits, source fingerprints, model weights and evaluation
+   reports per experiment. Full architecture/training contracts are in ML_MODELS.md.
+
+Mock preprocessing is provisional. Test recordings must not inform parameter
+selection. Shared generator references limit statistical independence. Print labels
+represent experimental conditions rather than verified instantaneous failure onset.

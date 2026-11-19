@@ -1,0 +1,224 @@
+{
+  "runs": [
+    {
+      "run": "run_0005",
+      "label": 1,
+      "candidate": 421,
+      "eligible": 400,
+      "rejected": 21,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 20
+      }
+    },
+    {
+      "run": "run_0006",
+      "label": 1,
+      "candidate": 538,
+      "eligible": 415,
+      "rejected": 123,
+      "reasons": {
+        "missing_auxiliary": 103,
+        "unsupported_boundary": 1,
+        "segment_boundary": 3,
+        "insufficient_count": 37,
+        "internal_gap": 25
+      }
+    },
+    {
+      "run": "run_0010",
+      "label": 0,
+      "candidate": 650,
+      "eligible": 614,
+      "rejected": 36,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 35
+      }
+    },
+    {
+      "run": "run_0011",
+      "label": 0,
+      "candidate": 502,
+      "eligible": 476,
+      "rejected": 26,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 25
+      }
+    },
+    {
+      "run": "run_0013",
+      "label": 0,
+      "candidate": 654,
+      "eligible": 618,
+      "rejected": 36,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 35
+      }
+    },
+    {
+      "run": "run_0014",
+      "label": 0,
+      "candidate": 665,
+      "eligible": 629,
+      "rejected": 36,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 35
+      }
+    },
+    {
+      "run": "run_0015",
+      "label": 0,
+      "candidate": 475,
+      "eligible": 449,
+      "rejected": 26,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 25
+      }
+    },
+    {
+      "run": "run_0017",
+      "label": 0,
+      "candidate": 560,
+      "eligible": 529,
+      "rejected": 31,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 30
+      }
+    },
+    {
+      "run": "run_0018",
+      "label": 0,
+      "candidate": 606,
+      "eligible": 575,
+      "rejected": 31,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 30
+      }
+    },
+    {
+      "run": "run_0020",
+      "label": 0,
+      "candidate": 495,
+      "eligible": 469,
+      "rejected": 26,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 25
+      }
+    },
+    {
+      "run": "run_0021",
+      "label": 0,
+      "candidate": 579,
+      "eligible": 548,
+      "rejected": 31,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 30
+      }
+    },
+    {
+      "run": "run_0022",
+      "label": 1,
+      "candidate": 556,
+      "eligible": 525,
+      "rejected": 31,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 30
+      }
+    },
+    {
+      "run": "run_0023",
+      "label": 1,
+      "candidate": 480,
+      "eligible": 454,
+      "rejected": 26,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 25
+      }
+    },
+    {
+      "run": "run_0024",
+      "label": 1,
+      "candidate": 736,
+      "eligible": 695,
+      "rejected": 41,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 40
+      }
+    },
+    {
+      "run": "run_0025",
+      "label": 1,
+      "candidate": 612,
+      "eligible": 581,
+      "rejected": 31,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 30
+      }
+    },
+    {
+      "run": "run_0026",
+      "label": 1,
+      "candidate": 660,
+      "eligible": 624,
+      "rejected": 36,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 35
+      }
+    },
+    {
+      "run": "run_0028",
+      "label": 1,
+      "candidate": 472,
+      "eligible": 446,
+      "rejected": 26,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 25
+      }
+    },
+    {
+      "run": "run_0030",
+      "label": 1,
+      "candidate": 507,
+      "eligible": 481,
+      "rejected": 26,
+      "reasons": {
+        "unsupported_boundary": 1,
+        "internal_gap": 25
+      }
+    }
+  ],
+  "classes": {
+    "1": {
+      "candidate": 4982,
+      "eligible": 4621
+    },
+    "0": {
+      "candidate": 5186,
+      "eligible": 4907
+    }
+  },
+  "reasons": {
+    "unsupported_boundary": 18,
+    "internal_gap": 525,
+    "missing_auxiliary": 103,
+    "segment_boundary": 3,
+    "insufficient_count": 37
+  },
+  "candidate": 10168,
+  "eligible": 9528
+}

@@ -1,0 +1,6 @@
+{
+  "best_epoch": 1,
+  "final_schedule": [
+    0.001
+  ]
+}

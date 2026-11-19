@@ -1,0 +1,60 @@
+{
+  "epochs": 1,
+  "learning_rates": [
+    0.001
+  ],
+  "development": [
+    "run_0001",
+    "run_0002",
+    "run_0004",
+    "run_0005",
+    "run_0006",
+    "run_0008",
+    "run_0010",
+    "run_0011",
+    "run_0013",
+    "run_0014",
+    "run_0015",
+    "run_0016",
+    "run_0017",
+    "run_0018",
+    "run_0020",
+    "run_0021",
+    "run_0022",
+    "run_0023",
+    "run_0024",
+    "run_0025",
+    "run_0026",
+    "run_0028",
+    "run_0029",
+    "run_0030"
+  ],
+  "test": [
+    "run_0003",
+    "run_0007",
+    "run_0009",
+    "run_0012",
+    "run_0019",
+    "run_0027"
+  ],
+  "dataset": "mock",
+  "config": {
+    "preprocessing": {
+      "hz": 767,
+      "coverage": 0.99,
+      "min_span": 9.99,
+      "max_gap": 0.0025
+    },
+    "seed": 42,
+    "batch_size": 32,
+    "epochs": 50,
+    "lr": 0.001,
+    "weight_decay": 0.0001,
+    "dropout": 0.2,
+    "patience": 10,
+    "min_delta": 0.0001,
+    "threshold": 0.5,
+    "threads": 4
+  },
+  "smoke": false
+}

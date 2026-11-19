@@ -2,3 +2,9 @@ __pycache__/
 *.py[cod]
 
 /data/mock_runs/
+
+.venv-cnn/
+/data/cnn_cache/
+
+# Keep training-resumption checkpoints local.
+/models/cnn_1d/experiments/**/resume_checkpoint.pt

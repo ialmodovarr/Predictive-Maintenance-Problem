@@ -1,0 +1,205 @@
+{
+  "protocol": "nozzle_health_oof",
+  "dataset": "mock",
+  "threshold": 0.5,
+  "targets": {
+    "nozzle_health": {
+      "trained": true,
+      "evaluation": {
+        "evaluated_runs": [
+          "run_0001",
+          "run_0002",
+          "run_0004",
+          "run_0005",
+          "run_0006",
+          "run_0008",
+          "run_0010",
+          "run_0011",
+          "run_0013",
+          "run_0014",
+          "run_0015",
+          "run_0016",
+          "run_0017",
+          "run_0018",
+          "run_0020",
+          "run_0021",
+          "run_0022",
+          "run_0023",
+          "run_0024",
+          "run_0025",
+          "run_0026",
+          "run_0028",
+          "run_0029",
+          "run_0030"
+        ],
+        "skipped_runs": [],
+        "windows": 12968,
+        "classes_in_evaluation": [
+          0,
+          1
+        ],
+        "precision": 0.40290735517465825,
+        "recall": 0.29070131496556045,
+        "f1": 0.33772847140129125,
+        "balanced_accuracy": 0.43623211644934556,
+        "confusion_matrix": [
+          [
+            3828,
+            2752
+          ],
+          [
+            4531,
+            1857
+          ]
+        ],
+        "per_run": [
+          {
+            "run_id": "run_0001",
+            "true": 0,
+            "fraction_predicted_failing": 0.08941877794336811,
+            "mean_failing_score": 0.2521230952950242
+          },
+          {
+            "run_id": "run_0002",
+            "true": 1,
+            "fraction_predicted_failing": 0.9885433715220949,
+            "mean_failing_score": 0.6868595725288172
+          },
+          {
+            "run_id": "run_0004",
+            "true": 1,
+            "fraction_predicted_failing": 0.10352422907488987,
+            "mean_failing_score": 0.4420336763239117
+          },
+          {
+            "run_id": "run_0005",
+            "true": 1,
+            "fraction_predicted_failing": 0.23,
+            "mean_failing_score": 0.4571828516572714
+          },
+          {
+            "run_id": "run_0006",
+            "true": 1,
+            "fraction_predicted_failing": 0.24096385542168675,
+            "mean_failing_score": 0.2694781459823071
+          },
+          {
+            "run_id": "run_0008",
+            "true": 0,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.2748728813535541
+          },
+          {
+            "run_id": "run_0010",
+            "true": 0,
+            "fraction_predicted_failing": 0.0016286644951140066,
+            "mean_failing_score": 0.30161339469278287
+          },
+          {
+            "run_id": "run_0011",
+            "true": 0,
+            "fraction_predicted_failing": 0.41596638655462187,
+            "mean_failing_score": 0.47851631010906037
+          },
+          {
+            "run_id": "run_0013",
+            "true": 0,
+            "fraction_predicted_failing": 0.9789644012944984,
+            "mean_failing_score": 0.7061924682658853
+          },
+          {
+            "run_id": "run_0014",
+            "true": 0,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.2582940867197343
+          },
+          {
+            "run_id": "run_0015",
+            "true": 0,
+            "fraction_predicted_failing": 1.0,
+            "mean_failing_score": 0.7764829105152053
+          },
+          {
+            "run_id": "run_0016",
+            "true": 0,
+            "fraction_predicted_failing": 0.9977973568281938,
+            "mean_failing_score": 0.7578303542825093
+          },
+          {
+            "run_id": "run_0017",
+            "true": 0,
+            "fraction_predicted_failing": 1.0,
+            "mean_failing_score": 0.7294005362883859
+          },
+          {
+            "run_id": "run_0018",
+            "true": 0,
+            "fraction_predicted_failing": 0.47130434782608693,
+            "mean_failing_score": 0.48171727286732713
+          },
+          {
+            "run_id": "run_0020",
+            "true": 0,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.0008741565281420665
+          },
+          {
+            "run_id": "run_0021",
+            "true": 0,
+            "fraction_predicted_failing": 0.33941605839416056,
+            "mean_failing_score": 0.4584532893215218
+          },
+          {
+            "run_id": "run_0022",
+            "true": 1,
+            "fraction_predicted_failing": 0.1180952380952381,
+            "mean_failing_score": 0.35628095500525975
+          },
+          {
+            "run_id": "run_0023",
+            "true": 1,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.009841054338347371
+          },
+          {
+            "run_id": "run_0024",
+            "true": 1,
+            "fraction_predicted_failing": 0.0014388489208633094,
+            "mean_failing_score": 0.27221223428952607
+          },
+          {
+            "run_id": "run_0025",
+            "true": 1,
+            "fraction_predicted_failing": 0.8932874354561101,
+            "mean_failing_score": 0.5755469633359301
+          },
+          {
+            "run_id": "run_0026",
+            "true": 1,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.008407762517150226
+          },
+          {
+            "run_id": "run_0028",
+            "true": 1,
+            "fraction_predicted_failing": 0.968609865470852,
+            "mean_failing_score": 0.6761869354499295
+          },
+          {
+            "run_id": "run_0029",
+            "true": 1,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.328798943944806
+          },
+          {
+            "run_id": "run_0030",
+            "true": 1,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.1269082970657771
+          }
+        ]
+      }
+    }
+  },
+  "run_balanced_loss": 1.932539849121629
+}

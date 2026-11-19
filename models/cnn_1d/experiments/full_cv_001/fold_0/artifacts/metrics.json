@@ -1,0 +1,79 @@
+{
+  "protocol": "validation",
+  "dataset": "mock",
+  "threshold": 0.5,
+  "targets": {
+    "nozzle_health": {
+      "trained": true,
+      "evaluation": {
+        "evaluated_runs": [
+          "run_0005",
+          "run_0010",
+          "run_0014",
+          "run_0015",
+          "run_0024",
+          "run_0028"
+        ],
+        "skipped_runs": [],
+        "windows": 3233,
+        "classes_in_evaluation": [
+          0,
+          1
+        ],
+        "precision": 0.5384615384615384,
+        "recall": 0.34068786502271253,
+        "f1": 0.417329093799682,
+        "balanced_accuracy": 0.537365209107101,
+        "confusion_matrix": [
+          [
+            1242,
+            450
+          ],
+          [
+            1016,
+            525
+          ]
+        ],
+        "per_run": [
+          {
+            "run_id": "run_0005",
+            "true": 1,
+            "fraction_predicted_failing": 0.23,
+            "mean_failing_score": 0.4571828516572714
+          },
+          {
+            "run_id": "run_0010",
+            "true": 0,
+            "fraction_predicted_failing": 0.0016286644951140066,
+            "mean_failing_score": 0.30161339469278287
+          },
+          {
+            "run_id": "run_0014",
+            "true": 0,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.2582940867197343
+          },
+          {
+            "run_id": "run_0015",
+            "true": 0,
+            "fraction_predicted_failing": 1.0,
+            "mean_failing_score": 0.7764829105152053
+          },
+          {
+            "run_id": "run_0024",
+            "true": 1,
+            "fraction_predicted_failing": 0.0014388489208633094,
+            "mean_failing_score": 0.27221223428952607
+          },
+          {
+            "run_id": "run_0028",
+            "true": 1,
+            "fraction_predicted_failing": 0.968609865470852,
+            "mean_failing_score": 0.6761869354499295
+          }
+        ]
+      }
+    }
+  },
+  "run_balanced_loss": 0.7879587706166212
+}

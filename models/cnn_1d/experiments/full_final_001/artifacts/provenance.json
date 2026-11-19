@@ -1,0 +1,913 @@
+{
+  "dataset": "mock",
+  "features": [
+    "api_extruder_temperature_mean",
+    "api_extruder_temperature_std",
+    "api_extruder_temperature_slope",
+    "api_extruder_temperature_error",
+    "api_head_velocity_mean",
+    "api_head_velocity_std",
+    "filament_velocity_mean",
+    "filament_movement_rate_std",
+    "filament_movement_fraction_pct",
+    "filament_longest_no_movement_interval_s",
+    "thermocouple_temperature_mean",
+    "thermocouple_temperature_std",
+    "thermocouple_temperature_slope"
+  ],
+  "python": "3.12.5",
+  "torch": "2.15.0+cpu",
+  "numpy": "2.5.5",
+  "device": "cpu",
+  "smoke_window_limit": null,
+  "cache_manifests": [
+    {
+      "dataset": "mock",
+      "run": "run_0001",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0001",
+      "fingerprint": "d192bf4cd3cccd77ea12f816f7b612785fba9c679e7498628be45fcb9acc90ca",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "d8401b813b38053f0262fed55ec3209a544082107f4918d9515c749c04b07d91",
+        "features\\api_features.csv": "cfd4a07e56d622e48f8ee7cd2154310c4dd4f0307ea8ee866fe3946dee293cd7",
+        "features\\sensor_features.csv": "ea1bef86bb05a98564fdcaa988b230034c1a11b3858d52ba6cdf3a76810296be",
+        "labels\\print_labels.csv": "3544e4883ca7a958d32453f76545ff8669d927893e99371be55f409fed5248f6",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 707,
+      "eligible": 671
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0002",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0002",
+      "fingerprint": "e3fc718da09fb0f272efdc79d70d3eef09accefafd703fca457284e5e2ea9883",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "7d31ae031fea2815a14cd4a23e36cb14af3c25fa488bc6df7712a5f3fb22b353",
+        "features\\api_features.csv": "c9fd0f77e3a3b61934be8d921eab6f925ab4988837884e9765129bb51aca3e99",
+        "features\\sensor_features.csv": "e954beb9092a6410ce730e6e2d3dc79edc5f4675340e9fd9695f72f83835643e",
+        "labels\\print_labels.csv": "78259052bc4943af3d3e082fac6f14dd3b637b1fd86fa17fa3bdd9738189c388",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 647,
+      "eligible": 611
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0004",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0004",
+      "fingerprint": "75ff77832866e4a179516169289dc48bb147360d41287392e5dffc301656b165",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "4090901bea87d4069f5b16dd80e4b8dadb80e4830f93fe688500c29354d4178a",
+        "features\\api_features.csv": "d81f83abefe1dc03d6150fac8e414cbccc720766066d55db90d2d18db19f4186",
+        "features\\sensor_features.csv": "c4f663d6e259f8a4040deb348dac2647e4a227bc5c55340009fdb01d1114c61d",
+        "labels\\print_labels.csv": "03d9b002daab2a8911f8ba7d9d595a9d3ef8aac02b85c6956c62fa691dbcd2fc",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 480,
+      "eligible": 454
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0005",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0005",
+      "fingerprint": "8dc248a0f261641f8a47b3ec95bc05a276a63a914030e9cbd028dd6c2d73b8d8",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "c4ab0f8cb2aae49dc5dd92fc598c5fd23125224adeab09cb84bc5ac6a8804d59",
+        "features\\api_features.csv": "9daf299fc45dd57308741ebffcfbc93d10d745f415ad5e2de3575c95bebf2b4a",
+        "features\\sensor_features.csv": "6c94f26ea7aa64d1e46b710a416afba49f7c9434a03c9b13723b60d7ccfbd3ff",
+        "labels\\print_labels.csv": "2ec385944b22146470480d0a1d0e83e3b87701bb3bdc6765090979db7950c458",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 421,
+      "eligible": 400
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0006",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0006",
+      "fingerprint": "0d58bebefb1d7e7f2c803efc68cb8eb5b7686c9651834b146adb5fdd35c7bc18",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "0e9438729547193ddae13cbf6aa5a84d3fb94e47c83738239a5d2d16fa80307f",
+        "features\\api_features.csv": "3aaea5ccdb547c2d21b3987ca5925c57cfac716f8e95ea71ea5695e3867e1308",
+        "features\\sensor_features.csv": "bb7d37d746c7fb1e904089d65ecceb3ae3ab7801e77f94fb0afa73d22165b420",
+        "labels\\print_labels.csv": "a47d0b7db36074aba6cb8d4cda3b9a282f7cd6067a2446b3cd3fa05c0b1fd83d",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 538,
+      "eligible": 415
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0008",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0008",
+      "fingerprint": "8c15384cbae42d99d0474157e8104b46f4c168fc6ddb408602e7088ee4969a6e",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "055e36c9fd660eb9ffe1d4b28e1c45c5cbb39c985fe3ff562bf726df3767ffb9",
+        "features\\api_features.csv": "146f987ee2a302bfeeb10482e12cf3ed65bf0ef0028bc7c76f6ad84e914984c6",
+        "features\\sensor_features.csv": "2d6f9722a35a939366cc14ac73bbbde00ae64b827d18ac548281a388506b5afa",
+        "labels\\print_labels.csv": "8084418a67fc9e849278c137ae17b42d705e72832ac4a850611da02013f7ccb2",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 579,
+      "eligible": 548
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0010",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0010",
+      "fingerprint": "f86a6e5833896ebb9ad617d2f250e5064f1d7935c7e0b1f57d6be472756f3d95",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "d3e4340213382cf7504b26ffa2117066325ff740f039cd4bd0764ece0739c215",
+        "features\\api_features.csv": "4797db3565dcb30d192f01e827758c6248cbb693c7df7f0af69f724577bf86d5",
+        "features\\sensor_features.csv": "90a23448528067a4124f0aca82b57bdcf5de37d6d88264889f516c2b5f35c2d4",
+        "labels\\print_labels.csv": "a4c808ec48f17cad429a5cf863e41c1f0d2b79fb8f1b1ba2b8d63faf22741aa8",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 650,
+      "eligible": 614
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0011",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0011",
+      "fingerprint": "5656c72eae8fc2041eb2ae0dfc3f06d8d4509a0b4e70c7819d389906611af8ca",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "09506a77fd64cdbd16b65acbac55b90e226cf330735713757e1d95e01afc36fa",
+        "features\\api_features.csv": "9fed8f98fbd73cce8233d5b712824314f98abea86903e36430348d84e99ee4c5",
+        "features\\sensor_features.csv": "66d68a6805034c3bf3c41f46457eda4c45709adc8d3325d0fe22ab39a3bab318",
+        "labels\\print_labels.csv": "f827deebc995bc15af0587400a9f416a18e210b58573ad06cf6e7196e2d491b4",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 502,
+      "eligible": 476
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0013",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0013",
+      "fingerprint": "b10afdcde96d1c2b1515dc65cbca52801b97d1429d85238201f164f9ea629d64",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "58d9216a001120d7d961d2f59f88d14ef97c665383b552371674b5c440f3d76d",
+        "features\\api_features.csv": "b8de7aa8f152fc213f4ee0d05d3afa3a091ca025c7645da3efdd693e3973819a",
+        "features\\sensor_features.csv": "b687f3dfbf22c93d830c755e266ce0330ab01bb67701e7bdcd855c9c4aa5e593",
+        "labels\\print_labels.csv": "7f4778361ee06a56c2f8f7893ee7209b8276fe5b808b76801e521e7c78528ffb",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 654,
+      "eligible": 618
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0014",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0014",
+      "fingerprint": "275d412297200c3638c12a4aace1bdaa6a24d2384f9581c5c7fca3f0fe906130",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "7e8b558e35f0076348f2356ab9e981ab7218ffe4847f25080f111225eab73926",
+        "features\\api_features.csv": "47739a19951352a06bae43a616df84eacfbc4a56d09cd09cf955a785581a985d",
+        "features\\sensor_features.csv": "8842d02477ea7570cab9dbda1301ccca7f4377e5098323c9c3864adde21a3898",
+        "labels\\print_labels.csv": "67d3f6b16319c9fad224725537c623ab3fdace23ed39db833dc48528270d59c7",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 665,
+      "eligible": 629
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0015",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0015",
+      "fingerprint": "808a70958bb2b948cfe42168d8244f0866a1dae275f792b583fa9a67a7f02a3b",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "23c5d5fc42e9f271fae09cc99b97941be5e28a1ae6d40b7cfbac8b1a005e7c95",
+        "features\\api_features.csv": "3d516a6853923b895b466d83ce30a2800881fd47c6c7dea0b11bf10398955311",
+        "features\\sensor_features.csv": "afa05c8cef9a763b606a47ab9575d7449e2bbf08a869d32bceab4189cfc426c7",
+        "labels\\print_labels.csv": "04991aa4db6bd91c595428f5cafaea449695e0cf05b6b6a6a9aea57c32b27d96",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 475,
+      "eligible": 449
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0016",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0016",
+      "fingerprint": "6fe9ada813da5f1b6822e850756719f5d4d9027a726c84921b82fba2e5a353da",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "74d7361859408acd336ad39b79efe6790e1e5bb796d173e8296106c45696ddf7",
+        "features\\api_features.csv": "d6318633e16b6ec01e20a1dd48abda870a9dfeb5ca46973d114f991f3bc958b3",
+        "features\\sensor_features.csv": "2d4d0cec67f133699642f54e747794682c479305c6d3080171c0c3908687acf2",
+        "labels\\print_labels.csv": "1d9d712de6eab81f5635d0e17a122bf5d8f5874037913dc52a57e1e47be7f600",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 480,
+      "eligible": 454
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0017",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0017",
+      "fingerprint": "65668dccb6d394b2de20ee57662d6c74579d7d287a349b89657d783adacfedf1",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "8b85e85eff6e1580fc02b05e2877615f033e2b3674cf28321b84996d762320ff",
+        "features\\api_features.csv": "c564330946f1c86b2a78c8a401b095306b4eb434a747459bd18bc9505df1123d",
+        "features\\sensor_features.csv": "3f452c802eb676364d53c082718ea2093c5e6a4a58103db73582871a8d2861b7",
+        "labels\\print_labels.csv": "7a954d1c70baad60d5438d7d81d9ac9ad8b74c63e36fd1f8b9bb5de4527a06f5",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 560,
+      "eligible": 529
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0018",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0018",
+      "fingerprint": "7af34a96b660b21f62312a1e09e46bfc7beac265997dffc8d3547a91dc282d0d",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "43276e36c86e324aa4cb71b8b90bd92ba72bb5231a3779b92df5ff66854ef288",
+        "features\\api_features.csv": "9dfa1e0c5a06222988b8278faea29fd7a3a1bf5ed437aea69cc81e8516fb74ee",
+        "features\\sensor_features.csv": "8839074be9b9d6f56b62539831517c8762cb5beb7404450e501d1b5375604a46",
+        "labels\\print_labels.csv": "45894ba751868266d21f2097dc1d86cf55e78bfe0c3f2ef2b56bad53b6226c22",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 606,
+      "eligible": 575
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0020",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0020",
+      "fingerprint": "3c8857fea6d911bb0a88f36bdba296f59de97cd28a25e38c7343806af919bf88",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "647f47e248167e71c44746e93bad3c9a0afe3b223ccdb81b6c9186ecc7ab008c",
+        "features\\api_features.csv": "890d52b348ce792a84145658a868b1ca71a3d52bb7527fdbddc062e4874dc40f",
+        "features\\sensor_features.csv": "c8d2114cca89429138252e138c1240030b66e198661913b42924a423b7152c99",
+        "labels\\print_labels.csv": "443df9741350c43f62f094e59bbcf84be6060846632d6a95a0c5fb895cd7e186",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 495,
+      "eligible": 469
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0021",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0021",
+      "fingerprint": "5ed0379dbe6fed6e1512d7d0ecebbda9d4adfdb65d0a8bb12a6a56367a47f220",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "41c058285788bd838511479ee9d2619791457091e36a14bdc545f130c7fe3b8c",
+        "features\\api_features.csv": "5f9d421c4f24b7b0adb6d51dfe758613236047fb335acfbaecf3186fa2b00507",
+        "features\\sensor_features.csv": "bf65d8b9ec19a0a69255ecebf51ad879bfbd960e7521d63d831b3be9a6a12eae",
+        "labels\\print_labels.csv": "3c31b9dd0597340d65d3856c0f82eac53f4fe3477cbe971484a6bd247741052b",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 579,
+      "eligible": 548
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0022",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0022",
+      "fingerprint": "ef4271344d6bcc40882985a8ca457b07dc8fbd1d95d0eeebf8e9ae37a5a146be",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "0c5ff8c56aa34108d403db52b2bca3adce08c45cd605cdeaaf7c0ec916b314ec",
+        "features\\api_features.csv": "da7684d01daa0e3d9334c4f8afe6e0561cf48913ad7b0a1457c4e6e88972f338",
+        "features\\sensor_features.csv": "fc80dfe87be6f0d6828f77d14efbb1edee90daf378738aa658ecd5b5665b3cb9",
+        "labels\\print_labels.csv": "e33d937c7f2d3c0ae7db068a9ae8f6ddd5606e3bfa64438eaf1ca83d93a868fb",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 556,
+      "eligible": 525
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0023",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0023",
+      "fingerprint": "363c99c86aa45f8d2ce2631771ae302aecb3bce00ecc7c3d083cc959c379e5e0",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "14417e61d24cf9548e6245270ef1d51df83afbbe63971cbdfe04a45783c6647c",
+        "features\\api_features.csv": "95156ab4389581b2a428da4df1e45f4b88abaf131e925edaea406cf7be97b1ee",
+        "features\\sensor_features.csv": "f2ce067940cd97f93875abdf0f41c0d6d8dd99301e9d94f42e83a8e8f17d1256",
+        "labels\\print_labels.csv": "31fec9287f91ab568df9f3debcaab3f2ff8f49b3918d4f44703186df2b0bf2b4",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 480,
+      "eligible": 454
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0024",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0024",
+      "fingerprint": "6cfd451db485c4006728892ead6f2bae70ec84020d06ee8e7b69c895ec2f4417",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "59a70a7fc407fa53c3ceb90cbe442675cf4c1b9bbe8edad1d92ac8316e6a2682",
+        "features\\api_features.csv": "277ac11ff2744b2b60d03748bb29ec30e54568e645c14bd618456bac0a239171",
+        "features\\sensor_features.csv": "238550febadde13ffe6cdac1a77dcc7773ecfa7b57e34f76dbec3e0e8554cb7e",
+        "labels\\print_labels.csv": "5eca793ecc162a71e8fc2ad6aad6c99394159fef1e626ec99d77641a4e1e2a00",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 736,
+      "eligible": 695
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0025",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0025",
+      "fingerprint": "ed365ecb7e5b9b27dfc1efc628f0778325f1feeac207b4d9a99a4ea08e725f6c",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "d548c86c99fc6f9a2e7bc4c94bc5539f74e26b8fb85a0f09cff77344ea89ce04",
+        "features\\api_features.csv": "01ffaf2cb3d15e35d7c2f87c62b270bce043cbf81de3b7aa040924773f233631",
+        "features\\sensor_features.csv": "53133931777e53a50194a1ef5572033d2c0d57bef1d22a1300e068af8fe99794",
+        "labels\\print_labels.csv": "4c7b5c9c0ba1fc8b7bc731878fa8e02a73ca54b6a285cf2073b60fe4c1e0d0f8",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 612,
+      "eligible": 581
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0026",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0026",
+      "fingerprint": "cdec0ae2d2b9e32016102da4cf7a0ce8a427adda60424c6d1b9064d4ab0f8554",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "1604bb9339ecfcd63b80eebfb51f0344c9d0918e521beeea68b01c5696db261b",
+        "features\\api_features.csv": "e20213cce28782fff8753150b840c0c3ffcd8b9d10bd6ef56636976dcc165c25",
+        "features\\sensor_features.csv": "a22580e06d753c90f75929575503588cfc1b580c222c9f89c8420f73438aaa76",
+        "labels\\print_labels.csv": "f0c83fe8bee64b361191d0411bf627ff0d120121b31fdfce0183c8bc657861be",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 660,
+      "eligible": 624
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0028",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0028",
+      "fingerprint": "4a83961aa88030268c8c414c49d9821db32ce9d0382f54cb738f2a704d54d5a2",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "e2822182c6bb4470fa4a2a373624a0832fb040158b3626ad8f6cf4fb2c806d29",
+        "features\\api_features.csv": "7b3914a6bef53abdaf5a3a3c63eeea5c61de2be75216b750ec7b17bea34901ae",
+        "features\\sensor_features.csv": "90661066f1a13ae37a26a99a705a84bce28421a63e183b3938d8429557a0bb8c",
+        "labels\\print_labels.csv": "fc07b8f15928be7944ce18a81f372ab1649584143905c1b7bb4f35f1a39ee4a3",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 472,
+      "eligible": 446
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0029",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0029",
+      "fingerprint": "0e2436b290291f5737f015b7fa56e4c66303e15f59a2a9c23b04faf12a3321d5",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "1858a4c2c5233f6eb381d12a92279ac2225b581c942740ffe300cb454f90e23c",
+        "features\\api_features.csv": "30d9a2314df3b3c56546713385a16a565abceab9159975e2c3d6119d8a56447c",
+        "features\\sensor_features.csv": "a34443b740bbb04d03e67b7adecdcc0081b5046399ca760bc92e95a27ffa21ab",
+        "labels\\print_labels.csv": "a6de75684cdbcb7d32506c16a3350d86e4141477f2fa198ce27197ba60435a2a",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 743,
+      "eligible": 702
+    },
+    {
+      "dataset": "mock",
+      "run": "run_0030",
+      "source": "C:\\School\\Capstone\\Predictive-Maintenance-Problem\\data\\mock_runs\\run_0030",
+      "fingerprint": "9b63ad84f3cf7d77360aa40882560844103c5a9009f9fcdbeace1ce8eef0b57f",
+      "source_hashes": {
+        "raw\\sensor_raw.csv": "4e3f84526db9e3d308dac03fb469666051a188eeaf73fcc426fb201749e58186",
+        "features\\api_features.csv": "fd3503a205f70d958dc3aeccaaecfe2bf725a88073aec9593076782f2d2e66bf",
+        "features\\sensor_features.csv": "02b554b27e41cb4c07d69f54f23b7c5e135cac54afbd73e51be7a76dcf4839c0",
+        "labels\\print_labels.csv": "07694a99a8acd1a7a23b8c59b0332f80bd17ee480a4ff92a7eacd6a04daeb282",
+        "settings.json": "5cd9afd364accf093512e6b4b2dda459ac1de2f5a117f5a8fb831fe713aa65fa"
+      },
+      "preprocessing": {
+        "hz": 767,
+        "coverage": 0.99,
+        "min_span": 9.99,
+        "max_gap": 0.0025
+      },
+      "version": 2,
+      "features": [
+        "api_extruder_temperature_mean",
+        "api_extruder_temperature_std",
+        "api_extruder_temperature_slope",
+        "api_extruder_temperature_error",
+        "api_head_velocity_mean",
+        "api_head_velocity_std",
+        "filament_velocity_mean",
+        "filament_movement_rate_std",
+        "filament_movement_fraction_pct",
+        "filament_longest_no_movement_interval_s",
+        "thermocouple_temperature_mean",
+        "thermocouple_temperature_std",
+        "thermocouple_temperature_slope"
+      ],
+      "candidate": 507,
+      "eligible": 481
+    }
+  ]
+}

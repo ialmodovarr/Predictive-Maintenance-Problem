@@ -39,3 +39,22 @@ python -m pipeline.replay.historical             # write data/runs/run_XXXX
 [System architecture](PROJECT_ARCHITECTURE.MD) describes concurrent recording, clock mapping, windowing and recovery. [Pipeline specification](DATA_PIPELINE.md) and [feature definitions](FEATURE_DEFINITIONS_PROPOSAL.md) describe outputs and units. Run `python -m unittest discover -s tests -v` for synthetic streams and mock hardware tests. See [the original script map](legacy/README.md) for earlier collection tools.
 
 On hardware, check API authentication, serial format, sustained packet throughput and sequence gaps. Measure delays and compare a common physical timing event across sources to validate UTC alignment. Inspect filament direction during advance/retraction and verify acceleration scaling before training. Compare features with recorded machine behavior and measure lag on a full print.
+
+## Hybrid CNN
+
+The approved architecture and complete workflow are documented in [ML_MODELS.md](ML_MODELS.md).
+The [hybrid data pipeline](DATA_PIPELINE.md#hybrid-fusion-1d-cnn-data-pipeline) describes
+window eligibility, boundary interpolation and caching. Collection still uses run_pipeline.py.
+
+```powershell
+python -m venv .venv-cnn
+.\.venv-cnn\Scripts\python.exe -m pip install -r requirements-cnn.txt
+.\.venv-cnn\Scripts\python.exe -m unittest discover -s tests -v
+.\.venv-cnn\Scripts\python.exe models/cnn_1d/cnn_1d.py train --dataset mock --experiment smoke_001 --smoke
+```
+
+Smoke mode checks execution using a small development-only subset. Use unique
+experiment names. See ML_MODELS.md for preparation, full training, CV, final fitting,
+test evaluation and saved-model prediction commands. Generated caches and artifacts
+are ignored by Git; original recordings and the existing RF/XGBoost interfaces are
+preserved. Mock metrics do not establish real-world fault-detection performance.

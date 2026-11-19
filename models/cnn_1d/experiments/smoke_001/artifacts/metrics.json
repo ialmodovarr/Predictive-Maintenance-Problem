@@ -1,0 +1,51 @@
+{
+  "protocol": "validation",
+  "dataset": "mock",
+  "threshold": 0.5,
+  "targets": {
+    "nozzle_health": {
+      "trained": true,
+      "evaluation": {
+        "evaluated_runs": [
+          "run_0005",
+          "run_0010"
+        ],
+        "skipped_runs": [],
+        "windows": 16,
+        "classes_in_evaluation": [
+          0,
+          1
+        ],
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "balanced_accuracy": 0.25,
+        "confusion_matrix": [
+          [
+            4,
+            4
+          ],
+          [
+            8,
+            0
+          ]
+        ],
+        "per_run": [
+          {
+            "run_id": "run_0005",
+            "true": 1,
+            "fraction_predicted_failing": 0.0,
+            "mean_failing_score": 0.4666743092238903
+          },
+          {
+            "run_id": "run_0010",
+            "true": 0,
+            "fraction_predicted_failing": 0.5,
+            "mean_failing_score": 0.494018092751503
+          }
+        ]
+      }
+    }
+  },
+  "run_balanced_loss": 0.722295917570591
+}
