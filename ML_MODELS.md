@@ -3,7 +3,7 @@
 ## Scope and evidence
 
 The hybrid 1D-CNN classifies nozzle health only: healthy = 0, failing = 1.
-Existing feeder and motion labels and RF/XGBoost behavior are preserved. Every
+Existing feeder and motion labels and RF behavior are preserved. Every
 window inherits its print label; this is not a verified instantaneous fault-onset
 label. Scores are not calibrated physical probabilities. No live CNN integration
 is implemented. `run_pipeline.py` remains the live recording/feature entry point.
@@ -15,22 +15,65 @@ combine `data/mock_runs` and `data/runs` implicitly. Temperature error can encod
 experimental temperature interventions; retain it in this approved baseline and
 interpret results accordingly. Stationary filament intervals can be normal pauses.
 
-## Existing Random Forest and XGBoost
+## Random Forest and XGBoost
 
-`models/random_forest/random_forest.py` and `models/xgboost/xgboost_model.py`
-load matching per-run API/sensor features and verify labels and boundaries.
-Their CLIs default to `data/runs`. They evaluate leave-one-run-out, pool held-out
-window predictions, and fit final estimators on all selected runs. RF uses median
-imputation and missing indicators fitted inside each fold; XGBoost handles missing
-inputs through its estimator. Single-class targets are skipped.
+Random Forest retains its original real-data default and leave-one-run-out evaluation.
+XGBoost now trains nozzle_health only (healthy=0, failing=1), defaulting to
+`data/mock_runs`. Select `--dataset runs` explicitly for real recordings and provide
+`--split-file` with disjoint train_validation and test run lists. Unexpected labels,
+mixed feature versions, mismatched windows and invalid numeric inputs are rejected.
+The shared RF per-run loader remains unchanged. All 28 features remain selected by
+default; --features and --exclude remain available, including temperature error.
+XGBoost validates predictor names against the six API and 22 sensor features in
+DATA_PIPELINE.md. Unexpected feature columns are rejected during training and
+prediction, including numeric generation metadata. Saved-model feature selections
+are checked against the same allowlist; CSV and model feature order is preserved.
 
-Their `artifacts/` contains trained `.joblib` bundles, `metrics.json`, feature
-importance CSVs, and OOF predictions. `predictions/` contains saved-model run
-predictions. These outputs can be overwritten by their existing commands.
-Their saved results are not directly comparable with the CNN's mock split,
-complete-input eligibility, or four-fold procedure. Fair comparison requires the
-same source data, eligible windows and run partitions in a separately authorized
-comparison workflow. The existing model implementations are unchanged.
+XGBoost uses the predefined mock split and the CNN's four run-stratified folds
+(sorted development IDs, shuffle=True, seed=42). Saved CNN fold assignments are
+checked when available. Each fold trains from scratch; balanced sample weights
+are calculated from that fold's training windows. The final model starts fresh on
+all development runs, then scores the held-out test runs. Hyperparameters remain
+300 trees, depth 3, learning rate .05, subsample .8, colsample_bytree .8,
+min_child_weight 5, reg_lambda 1, binary:logistic, logloss, hist, default max_bin
+256, n_jobs=-1 and seed 42. Threshold is .5; no early stopping, tuning, calibration,
+scaling or imputation is performed. Native NaN handling retains partial windows.
+All-selected-features-missing windows receive insufficient_data and blank predictions;
+they are counted explicitly and excluded from metric calculations and fitting.
+
+Generated outputs are under models/xgboost/artifacts/<mock_runs|runs>/:
+nozzle_health_model.joblib, nozzle_health_oof_predictions.csv,
+nozzle_health_test_predictions.csv, nozzle_health_feature_importance.csv and
+metrics.json. Existing nonempty output directories refuse training; deliberately
+archive prior outputs before rerunning. Legacy outputs remain untouched.
+The model bundle retains model/features/target/threshold and adds dataset,
+feature_version, training_runs, creation time and library versions. Only the final
+model is saved. metrics.json retains the existing evaluation path for pooled OOF
+metrics and adds fold_evaluations, test_evaluation, exact splits, effective model
+configuration, separate coverage diagnostics and eligibility counts. Precision,
+recall, F1, balanced accuracy, confusion matrices and per-run summaries retain
+Bella's calculations; coverage warnings retain the >=10 percentage-point rule.
+
+Prediction loads only the selected dataset's nozzle model, checks feature version
+and ordered inputs, and accepts fully unlabeled feature files. If labels are present,
+the existing label consistency checks apply. Outputs under predictions/<dataset>/
+retain identifiers, UTC boundaries, failing score and predicted class, adding status,
+available_feature_count and seen_in_training. A run absent from training is not
+necessarily independent of synthetic generation. Scores are not calibrated failure
+probabilities. Prediction remains offline; no live system is implemented.
+
+```powershell
+python models/xgboost/xgboost_model.py train --dataset mock_runs
+python models/xgboost/xgboost_model.py train --dataset runs --split-file path/to/split.json
+python models/xgboost/xgboost_model.py predict --dataset mock_runs --run run_0008
+python models/xgboost/xgboost_model.py predict --dataset runs --run run_0009
+```
+
+Mock tests retain shared generation references, including held-out recordings;
+these are workflow evaluations, not independent experimental validation. CNN and
+XGBoost share run partitions but differ in eligible windows. RF's existing outputs
+use a different dataset and protocol. Direct performance comparisons require these
+differences to be addressed explicitly.
 
 ## Approved hybrid architecture
 
@@ -286,3 +329,15 @@ Reports are under each experiment's artifacts/metrics.json; the final test repor
 is full_final_001/test_evaluation/metrics.json with test_predictions.csv. Final
 weights and fitted preprocessing are in full_final_001/artifacts/. No additional
 training or threshold tuning was performed after examining test results.
+
+### XGBoost mock migration verification
+
+The initial migrated baseline completed four CV fits and one final development fit.
+OOF evaluation retained 13,804 windows; final test evaluation retained 3,442.
+OOF precision/recall/F1/balanced accuracy: 0.496800 / 0.543783 / 0.519231 / 0.500459.
+Test precision/recall/F1/balanced accuracy: 0.356145 / 0.607208 / 0.448961 / 0.305820.
+Saved-model prediction on run_0008 succeeded; this run belongs to final training.
+Checks verified partition isolation, unique window identities, report counts,
+all-missing abstention, partial-input scoring, empty evaluation handling and invalid
+schema/run-path rejection. No settings were tuned after inspecting test results.
+These mock results do not demonstrate real-world fault detection.
